@@ -20,15 +20,17 @@ For the stats of all known players:
     
     http://server:port/userstats.xml
     
+To fetch the stats of the given user:
+
+    http://server:port/userstats.xml?player=username    
+   
 This will eventually be changed to a summarized view of all users stats as soon as the selection of users is implemented 
     
 The following commands are planned but not implemented yet:
 
-To fetch the stats of the given user:
 
-    http://server:port/userstats.xml?id=username
     
 to get data provided by the iConomy plugin:
     
     http://server:port/money.xml
-    http://server:port/money.xml?id=username
+    http://server:port/money.xml?player=username

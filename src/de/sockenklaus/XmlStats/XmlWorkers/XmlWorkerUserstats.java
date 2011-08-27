@@ -78,7 +78,9 @@ public class XmlWorkerUserstats extends XmlWorker {
 			 */
 				
 			for(String playerName : statsDS.getStats().keySet()){
-				root.appendChild(getPlayerElement(playerName, doc));
+				if (!parameters.containsKey("player") || (parameters.containsKey("player") && parameters.get("player").contains(playerName))){
+					root.appendChild(getPlayerElement(playerName, doc));
+				}
 			}
 			/*
 			 * Hier endet der XML-Aufbau
