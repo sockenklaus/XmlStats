@@ -8,18 +8,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nidefawl.Stats.Stats;
 
-import de.sockenklaus.XmlStats.Settings.Settings;
-
 public class XmlStats extends JavaPlugin {
 
 	public final static Logger log = Logger.getLogger("Minecraft");
 	public final static double version = 0.01;
-	public final static String logprefix = "[XmlStats-" + version + "]";
+	public final static String logprefix = "[XmlStats]";
 	public boolean enabled = false;
 	private static Stats statsPlugin;
 	private static Server serverRef;
-	public WebServer xmlQueryServer;
-	
+	private WebServer xmlQueryServer;
+	private Settings settings;
 	
 	@Override
 	public void onDisable() {
@@ -41,12 +39,12 @@ public class XmlStats extends JavaPlugin {
 		statsPlugin = (Stats)getServer().getPluginManager().getPlugin("Stats");
 		serverRef = getServer();
 		
-		Settings.load(this);
+		settings = new Settings(this);
 		
-		if (Settings.xmlStatsEnabled){
+		if (settings.getBoolean("options.webserver-enabled")){
 			if (getServer().getPluginManager().isPluginEnabled("Stats")){
 				try {
-					xmlQueryServer = new WebServer(Settings.xmlStatsPort);
+					xmlQueryServer = new WebServer(settings.getInt("options.webserver-port"));
 					
 					enabled = true;
 					LogInfo("Plugin Enabled");
@@ -62,7 +60,7 @@ public class XmlStats extends JavaPlugin {
 			}
 		}
 		else {
-			LogError("Plugin ist derzeit in der "+getDataFolder().getPath()+"/"+Settings.settingsFilename+" deaktiviert.");
+			LogWarn("Webserver ist derzeit in der "+getDataFolder().getPath()+"/"+settings.getSettingsFilename()+" deaktiviert.");
 		}
 		
 		
