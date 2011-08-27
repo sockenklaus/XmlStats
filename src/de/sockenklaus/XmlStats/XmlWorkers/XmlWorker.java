@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) [2011]  [Pascal König]
+*
+* This program is free software; you can redistribute it and/or modify it under the terms of
+* the GNU General Public License as published by the Free Software Foundation; either version
+* 3 of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+* See the GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License along with this program; 
+* if not, see <http://www.gnu.org/licenses/>. 
+*/
 package de.sockenklaus.XmlStats.XmlWorkers;
 
 import java.io.IOException;
@@ -14,9 +28,16 @@ import com.sun.net.httpserver.HttpExchange;
 
 import de.sockenklaus.XmlStats.XmlStats;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class XmlWorker.
+ */
 @SuppressWarnings("restriction")
 public abstract class XmlWorker implements HttpHandler {
 	
+	/* (non-Javadoc)
+	 * @see com.sun.net.httpserver.HttpHandler#handle(com.sun.net.httpserver.HttpExchange)
+	 */
 	public void handle(HttpExchange exchange) {
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 		
@@ -51,6 +72,13 @@ public abstract class XmlWorker implements HttpHandler {
 		}
 	}
 	
+	/**
+	 * Parses the parameters.
+	 *
+	 * @param queryString the query string
+	 * @return the map
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 */
 	public Map<String, List<String>> parseParameters(String queryString) throws UnsupportedEncodingException {
 		Map<String, List<String>> result = new HashMap<String, List<String>>();
 		
@@ -87,5 +115,11 @@ public abstract class XmlWorker implements HttpHandler {
 		return result;
 	}
 	
+	/**
+	 * Gets the xML.
+	 *
+	 * @param parameters the parameters
+	 * @return the xML
+	 */
 	abstract String getXML(Map<String, List<String>> parameters);
 }

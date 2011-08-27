@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) [2011]  [Pascal König]
+*
+* This program is free software; you can redistribute it and/or modify it under the terms of
+* the GNU General Public License as published by the Free Software Foundation; either version
+* 3 of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+* See the GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License along with this program; 
+* if not, see <http://www.gnu.org/licenses/>. 
+*/
 package de.sockenklaus.XmlStats.XmlWorkers;
 
 import java.io.File;
@@ -24,9 +38,27 @@ import com.nidefawl.Stats.datasource.PlayerStat;
 
 import de.sockenklaus.XmlStats.Datasource.StatsDS;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class XmlWorkerUserstats.
+ */
 public class XmlWorkerUserstats extends XmlWorker {
 	
-	@Override
+	/** The stats ds. */
+	StatsDS statsDS = new StatsDS();
+	
+	/**
+	 * Instantiates a new xml worker userstats.
+	 */
+	public XmlWorkerUserstats(){
+		this.statsDS = new StatsDS();
+	}
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
+	 */
 	public String getXML(Map<String, List<String>> parameters) {
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -37,11 +69,6 @@ public class XmlWorkerUserstats extends XmlWorker {
 			StreamResult result = new StreamResult(writer);
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
-			StatsDS statsDS = new StatsDS();
-			
-			hModItemResolver itemResolver = new hModItemResolver(new File(statsDS.getDataFolder(),"items.txt"));
-			
-			String[] resolveCats = {"blockdestroy", "blockcreate", "itemdrop", "itempickup"};
 			
 			Element root = doc.createElement("stats");
 			doc.appendChild(root);
@@ -51,37 +78,9 @@ public class XmlWorkerUserstats extends XmlWorker {
 			 */
 				
 			for(String playerName : statsDS.getStats().keySet()){
-				PlayerStat player_stats = statsDS.getStats().get(playerName);
-				
-				Element elem_player = doc.createElement("player");
-				elem_player.setAttribute("name", playerName);
-					
-				for(String catName : player_stats.getCats()){
-					Category cat = player_stats.get(catName);
-					Element elem_cat = doc.createElement("category");
-					elem_cat.setAttribute("name", catName);
-						
-					for(String valName : cat.stats.keySet()){
-						int value = cat.get(valName);
-						Element elem_value = doc.createElement("stat");
-						
-						elem_value.setAttribute("name", valName);
-						
-						if (Arrays.asList(resolveCats).contains(catName)){
-							elem_value.setAttribute("id", String.valueOf(itemResolver.getItem(valName)));
-						}
-						elem_value.setAttribute("value", String.valueOf(value));
-						
-						elem_cat.appendChild(elem_value);
-					}
-					
-					
-					elem_player.appendChild(elem_cat);
-				}
-							
-				root.appendChild(elem_player);
+				root.appendChild(getPlayerElement(playerName, doc));
 			}
-						/*
+			/*
 			 * Hier endet der XML-Aufbau
 			 */
 			
@@ -96,5 +95,45 @@ public class XmlWorkerUserstats extends XmlWorker {
 		
 		return "";
 	}
-
+	
+	/**
+	 * Build a XML subtree for the given player.
+	 *
+	 * @param playerName the player name
+	 * @param doc the doc
+	 * @return 				Returns a XML subtree for the given playerName.
+	 */
+	private Element getPlayerElement(String playerName, Document doc){
+		hModItemResolver itemResolver = new hModItemResolver(new File(statsDS.getDataFolder(),"items.txt"));
+		String[] resolveCats = {"blockdestroy", "blockcreate", "itemdrop", "itempickup"};
+		
+		PlayerStat player_stats = statsDS.getStats().get(playerName);
+		
+		Element elem_player = doc.createElement("player");
+		elem_player.setAttribute("name", playerName);
+		
+		for(String catName : player_stats.getCats()){
+			Category cat = player_stats.get(catName);
+			Element elem_cat = doc.createElement("category");
+			elem_cat.setAttribute("name", catName);
+				
+			for(String valName : cat.stats.keySet()){
+				int value = cat.get(valName);
+				Element elem_value = doc.createElement("stat");
+				
+				elem_value.setAttribute("name", valName);
+				
+				if (Arrays.asList(resolveCats).contains(catName)){
+					elem_value.setAttribute("id", String.valueOf(itemResolver.getItem(valName)));
+				}
+				elem_value.setAttribute("value", String.valueOf(value));
+				
+				elem_cat.appendChild(elem_value);
+			}
+			
+			
+			elem_player.appendChild(elem_cat);
+		}
+		return elem_player;
+	}
 }

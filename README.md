@@ -31,4 +31,4 @@ To fetch the stats of the given user:
 to get data provided by the iConomy plugin:
     
     http://server:port/money.xml
-    http://server:port/money.xml?id=username self-explanatory
+    http://server:port/money.xml?id=username
