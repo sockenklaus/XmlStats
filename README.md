@@ -4,6 +4,17 @@ This plugin for the Bukkit Minecraft Server API ([Homepage](http://bukkig.org) |
 
 ## Usage
 
-Simply place the compiled **XmlStats.jar** in your servers plugin directory and execute the /reload-command on your server. The plugin will create it's config file in the /plugins/XmlStats directory. To enable the webserver of the plugin you have to edit the XmlStats.conf, set the following value and reload the server again:
+To install the plugin, simply place the compiled **XmlStats.jar** in your servers plugin directory and execute the /reload-command on your server. The plugin will create it's config file in the /plugins/XmlStats directory. To enable the webserver of the plugin you have to edit the config.yml, set the following value and reload the server again:
   
-    xmlstats-enabled = true
+    options.webserver-enabled: true
+    
+Afterwards you can access the following xml files:
+
+    http://server:port/users.xml for a list of all known players on your server.
+    http://server:port/userstats.xml for the stats of all known players
+    
+The following commands are planned but not implemented yet:
+
+    http://server:port/userstats.xml?id=username to fetch the stats of the given user
+    http://server:port/money.xml to get data provided by the iConomy plugin
+    http://server:port/money.xml?id=username self-explanatory

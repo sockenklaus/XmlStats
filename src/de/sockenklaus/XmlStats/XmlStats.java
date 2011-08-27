@@ -60,7 +60,7 @@ public class XmlStats extends JavaPlugin {
 			}
 		}
 		else {
-			LogWarn("Webserver ist derzeit in der "+getDataFolder().getPath()+"/"+settings.getSettingsFilename()+" deaktiviert.");
+			LogWarn("Webserver ist derzeit in der "+settings.getSettingsFilename()+" deaktiviert.");
 		}
 		
 		
