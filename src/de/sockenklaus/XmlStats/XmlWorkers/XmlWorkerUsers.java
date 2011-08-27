@@ -3,6 +3,7 @@ package de.sockenklaus.XmlStats.XmlWorkers;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,7 +22,7 @@ import de.sockenklaus.XmlStats.Datasource.UsersDS;
 public class XmlWorkerUsers extends XmlWorker {
 	
 	@Override
-	public String processQuery(Map<String, Object> parameters) {
+	public String getXML(Map<String, List<String>> parameters) {
 		UsersDS users = new UsersDS();
 		
 		try {

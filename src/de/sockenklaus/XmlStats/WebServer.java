@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpServer;
 
 import de.sockenklaus.XmlStats.XmlWorkers.*;
 
+@SuppressWarnings("restriction")
 public class WebServer {
 	
 	private InetSocketAddress address;

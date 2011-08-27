@@ -14,11 +14,11 @@ import com.sun.net.httpserver.HttpExchange;
 
 import de.sockenklaus.XmlStats.XmlStats;
 
-
+@SuppressWarnings("restriction")
 public abstract class XmlWorker implements HttpHandler {
 	
 	public void handle(HttpExchange exchange) {
-		Map<String, Object> parameters = new HashMap<String, Object>();
+		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 		
 		if("get".equalsIgnoreCase(exchange.getRequestMethod())){
 			String queryString = exchange.getRequestURI().getRawQuery();
@@ -27,14 +27,14 @@ public abstract class XmlWorker implements HttpHandler {
 			
 			try {
 				
-				parseQuery(queryString, parameters);
+				parameters = parseParameters(queryString);
 				
 			} catch(UnsupportedEncodingException ex){
 				XmlStats.LogError("Fehler beim Parsen des HTTP-Query-Strings.");
 				XmlStats.LogError(ex.getMessage());
 			}
 			
-			xmlResponse = processQuery(parameters);
+			xmlResponse = getXML(parameters);
 			
 			byteResponse = xmlResponse.getBytes();
 			
@@ -43,7 +43,7 @@ public abstract class XmlWorker implements HttpHandler {
 		        exchange.getResponseBody().write(byteResponse);
 			}
 			catch(IOException ex){
-				XmlStats.LogError("Fehler beim Senden HTTP-Antwort.");
+				XmlStats.LogError("Fehler beim Senden der HTTP-Antwort.");
 				XmlStats.LogError(ex.getMessage());
 			}
 	        
@@ -51,8 +51,9 @@ public abstract class XmlWorker implements HttpHandler {
 		}
 	}
 	
-	@SuppressWarnings("unchecked") 	
-	public void parseQuery(String queryString, Map<String, Object> parameters) throws UnsupportedEncodingException {
+	public Map<String, List<String>> parseParameters(String queryString) throws UnsupportedEncodingException {
+		Map<String, List<String>> result = new HashMap<String, List<String>>();
+		
 		if (queryString != null){
 			String pairs[] = queryString.split("[&]");
 			
@@ -70,26 +71,21 @@ public abstract class XmlWorker implements HttpHandler {
 					value = URLDecoder.decode(param[1], System.getProperty("file.encoding"));
 				}
 				
-				if (parameters.containsKey(key)){
-					Object obj = parameters.get(key);
+				if (result.containsKey(key)){
+					List<String> values = result.get(key);
 					
-					if(obj instanceof List<?>){
-						List<String> values = (List<String>)obj;
-						values.add(value);
-					}
-					else if (obj instanceof String){
-						List<String> values = new ArrayList<String>();
-						values.add((String)obj);
-						values.add(value);
-						parameters.put(key, values);
-					}
+					values.add(value);
 				}
 				else {
-					parameters.put(key, value);
+					List<String> values = new ArrayList<String>();
+					values.add(value);
+					
+					result.put(key, values);
 				}
 			}
 		}
+		return result;
 	}
 	
-	abstract String processQuery(Map<String, Object> parameters);
+	abstract String getXML(Map<String, List<String>> parameters);
 }

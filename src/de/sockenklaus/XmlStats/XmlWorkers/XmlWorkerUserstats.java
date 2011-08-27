@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,7 +27,7 @@ import de.sockenklaus.XmlStats.Datasource.StatsDS;
 public class XmlWorkerUserstats extends XmlWorker {
 	
 	@Override
-	public String processQuery(Map<String, Object> parameters) {
+	public String getXML(Map<String, List<String>> parameters) {
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
