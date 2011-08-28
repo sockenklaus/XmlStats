@@ -42,10 +42,6 @@ public class Settings {
 		else {
 			conf.setProperty("options.webserver-enabled", false);
 			conf.setProperty("options.webserver-port", 9123);
-			conf.setProperty("plugins.stats", true);
-			conf.setProperty("plugins.users", true);
-			conf.setProperty("plugins.achievements", false);
-			conf.setProperty("plugins.economy", false);
 			conf.save();
 		}
 	}

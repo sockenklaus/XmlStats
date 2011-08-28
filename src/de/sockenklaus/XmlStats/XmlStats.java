@@ -18,8 +18,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Server;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.iConomy.iConomy;
 import com.nidefawl.Stats.Stats;
 
 // TODO: Auto-generated Javadoc
@@ -32,9 +38,10 @@ public class XmlStats extends JavaPlugin {
 	private final static double version = 0.01;
 	private final static String logprefix = "[XmlStats]";
 	private boolean enabled = false;
-	private static Stats statsPlugin;
+	private static Stats Stats = null;
+	private static iConomy iConomy = null;
 	private static Server serverRef;
-	private WebServer xmlQueryServer;
+	private WebServer webServer;
 	private Settings settings;
 	
 	/* (non-Javadoc)
@@ -42,10 +49,13 @@ public class XmlStats extends JavaPlugin {
 	 */
 	@Override
 	public void onDisable() {
-		if(enabled && xmlQueryServer.isRunning()){
-			enabled = false;
+		if(this.enabled && this.webServer.isRunning()){
+			this.enabled = false;
 			
-			xmlQueryServer.stopServer();
+			iConomy = null;
+			Stats = null;
+			
+			this.webServer.stopServer();
 			
 			getServer().getScheduler().cancelTasks(this);
 			
@@ -58,30 +68,26 @@ public class XmlStats extends JavaPlugin {
 	 */
 	@Override
 	public void onEnable() {
-		
+	
 		getDataFolder().mkdirs();
-		statsPlugin = (Stats)getServer().getPluginManager().getPlugin("Stats");
+		
 		serverRef = getServer();
+		this.settings = new Settings(this);
 		
-		settings = new Settings(this);
-		
-		if (settings.getBoolean("options.webserver-enabled")){
-			if (getServer().getPluginManager().isPluginEnabled("Stats")){
-				try {
-					xmlQueryServer = new WebServer(settings.getInt("options.webserver-port"));
+		this.hookPlugins();
+
+		if (this.settings.getBoolean("options.webserver-enabled")){
+			try {
+				this.webServer = new WebServer(settings.getInt("options.webserver-port"));
 					
-					enabled = true;
-					LogInfo("Plugin Enabled");
-				}
-				catch (Exception ex){
-					LogError("Fehler beim Erstellen des Webservers:");
-					LogError(ex.getMessage());
-				}
-				
+				this.enabled = true;
+				LogInfo("Plugin Enabled");
 			}
-			else {
-				LogError("Stats-Plugin laeuft nicht... Breche ab...");
-			}
+			catch (Exception ex){
+				LogError("Fehler beim Erstellen des Webservers:");
+				LogError(ex.getMessage());
+				ex.printStackTrace();
+			}			
 		}
 		else {
 			LogWarn("Webserver ist derzeit in der "+settings.getSettingsFilename()+" deaktiviert.");
@@ -123,7 +129,7 @@ public class XmlStats extends JavaPlugin {
 	 * @return the stats plugin
 	 */
 	public static Stats getStatsPlugin(){
-		return statsPlugin;
+		return Stats;
 	}
 	
 	/**
@@ -134,5 +140,66 @@ public class XmlStats extends JavaPlugin {
 	public static Server getServerRef(){
 		return serverRef;
 	}
+	
+	public static iConomy getiConomyPlugin(){
+		return iConomy;
+	}
+	
+	public void onPluginDisable(PluginDisableEvent event){
+		if(iConomy != null){
+			if(event.getPlugin().getDescription().getName().equals("iConomy")){
+				iConomy = null;
+				LogInfo("iConomy is disabled now. Unhooking.");
+			}
+		}
+		if(Stats != null){
+			if(event.getPlugin().getDescription().getName().equals("Stats")){
+				Stats = null;
+				LogInfo("Stats is disabled now. Unhooking.");
+			}
+		}
+		
+	}
+	
+	public void onPluginEnable(PluginEnableEvent event){
+		this.hookPlugins();
+	}
+	
+	private void hookPlugins(){
+		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
+		Plugin iConomyTemp = getServer().getPluginManager().getPlugin("iConomy");
 
+        if(StatsTemp != null){
+        	if(StatsTemp.isEnabled() && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats")){
+        		Stats = (Stats)StatsTemp;
+        		LogInfo("Hooked into Stats!");
+        	}
+        }
+        else {
+        	LogError("Stats not found! Can't hook into it.");
+        }
+        if (iConomyTemp != null) {
+            if (iConomyTemp.isEnabled() && iConomyTemp.getClass().getName().equals("com.iConomy.iConomy")) {
+                iConomy = (iConomy)iConomyTemp;
+                LogInfo("Hooked into iConomy");
+            }
+        }
+        else {
+        	LogError("iConomy not found! Can't hook into it.");
+        }
+	}
+	
+	public static boolean isStatsHooked(){
+		if (Stats != null){
+			if(Stats.getClass().getName().equals("com.nidefawl.Stats.Stats") && Stats.isEnabled()) return true;
+		}
+		return false;
+	}
+	
+	public static boolean isiConomyHooked(){
+		if (iConomy != null){
+			if (iConomy.getClass().getName().equals("com.iConomy.iConomy") && iConomy.isEnabled()) return true;
+		}
+		return false;
+	}
 }

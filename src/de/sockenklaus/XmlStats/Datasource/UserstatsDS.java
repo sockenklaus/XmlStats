@@ -29,7 +29,7 @@ import de.sockenklaus.XmlStats.XmlStats;
 /**
  * The Class StatsDS.
  */
-public class StatsDS extends Datasource {
+public class UserstatsDS extends Datasource {
 	
 	private Stats statsPlugin;
 	private ArrayList<String> allPlayerNames;
@@ -38,7 +38,7 @@ public class StatsDS extends Datasource {
 	/**
 	 * Instantiates a new stats ds.
 	 */
-	public StatsDS() {
+	public UserstatsDS() {
 		this.statsPlugin = XmlStats.getStatsPlugin();
 		this.allPlayerNames = fetchAllPlayers();
 		this.stats = fetchPlayerStats(allPlayerNames);
@@ -128,5 +128,9 @@ public class StatsDS extends Datasource {
 		}
 		
 		return result;
+	}
+	
+	public void sortStats(){
+		
 	}
 }

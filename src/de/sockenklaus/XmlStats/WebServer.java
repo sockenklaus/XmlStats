@@ -44,7 +44,14 @@ public class WebServer {
 		
 		server.createContext("/users.xml", new XmlWorkerUsers());
 		server.createContext("/userstats.xml", new XmlWorkerUserstats());
-		server.createContext("/money.xml", new XmlWorkerMoney());
+		
+		if (XmlStats.isiConomyHooked()){
+			server.createContext("/money.xml", new XmlWorkerMoney());
+			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /money.xml.");
+		}
+		else {
+			XmlStats.LogWarn("iConomy not loaded correctly. Disabling /money.xml");
+		}
 		
 		this.server.start();
 	}

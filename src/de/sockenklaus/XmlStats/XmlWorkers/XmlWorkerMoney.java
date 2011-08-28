@@ -14,8 +14,25 @@
 */
 package de.sockenklaus.XmlStats.XmlWorkers;
 
+import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.nidefawl.Stats.Stats;
+
+import de.sockenklaus.XmlStats.Datasource.MoneyDS;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -23,12 +40,57 @@ import java.util.Map;
  */
 public class XmlWorkerMoney extends XmlWorker {
 
+	private MoneyDS moneyDS;
+	
+	public XmlWorkerMoney(){
+		this.moneyDS = new MoneyDS();
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
 	@Override
 	public String getXML(Map<String, List<String>> parameters) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document doc = builder.newDocument();
+			DOMSource source = new DOMSource(doc);
+			StringWriter writer = new StringWriter();
+			StreamResult result = new StreamResult(writer);
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			
+			HashMap<String, Double> balances = moneyDS.getBalances();
+			
+			Element root = doc.createElement("money");
+			doc.appendChild(root);
+			
+			/*
+			 * Hier wird das XML aufgebaut
+			 */
+			
+			for (String playerName : balances.keySet()){
+				Element elem_player = doc.createElement("player");
+				elem_player.setAttribute("name", playerName);
+				elem_player.setAttribute("balance", String.valueOf(balances.get(playerName)));
+				
+				root.appendChild(elem_player);
+			}
+			
+			/*
+			 * Hier endet der XML-Aufbau
+			 */
+			
+			transformer.transform(source, result);
+			return writer.toString();
+		} 
+		
+		catch (Exception e){
+			Stats.log.log(Level.SEVERE, "Something went terribly wrong!");
+			Stats.log.log(Level.SEVERE, e.getMessage());
+		}
+		
+		return "";
 	}
 }

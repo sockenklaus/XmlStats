@@ -14,9 +14,58 @@
 */
 package de.sockenklaus.XmlStats.Datasource;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.iConomy.iConomy;
+import com.iConomy.system.Account;
+import com.iConomy.system.Holdings;
+
+import de.sockenklaus.XmlStats.XmlStats;
+
 /**
  * The Class MoneyDS.
  */
 public class MoneyDS extends Datasource {
 
+	private iConomy iConomy;
+	private ArrayList<String> allPlayers;
+	
+	public MoneyDS(){
+		this.iConomy = XmlStats.getiConomyPlugin();
+		this.allPlayers = fetchAllPlayers();
+	}
+	
+	public HashMap<String, Double> getBalances(){
+		HashMap<String, Double> result = new HashMap<String, Double>();
+		
+		for (String playerName : allPlayers){
+			result.put(playerName, getBalance(playerName));
+		}
+		
+		return result;
+	}
+	
+	@SuppressWarnings("static-access")
+	private Double getBalance(String playerName){
+		Double result = 0.0;
+		
+		if (XmlStats.isiConomyHooked()){
+			if(this.iConomy.hasAccount(playerName)){
+				Account account = this.iConomy.getAccount(playerName);
+				
+				if (account != null){
+					Holdings balance = account.getHoldings();
+					result = balance.balance();
+				}
+				else XmlStats.LogError("The player has an account but it isn't valid. Bad data will return.");
+			}
+			else XmlStats.LogError("This player doesn't have a bank account and this action will return bad data");
+		}
+		else {
+			XmlStats.LogError("Something went wrong! /money.xml shouldn't be enabled but it's datasource was called! This will return bad results.");
+		}
+		
+		return result;
+	}
 }

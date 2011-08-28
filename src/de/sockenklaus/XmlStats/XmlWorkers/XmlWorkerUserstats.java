@@ -37,7 +37,7 @@ import com.nidefawl.Stats.ItemResolver.hModItemResolver;
 import com.nidefawl.Stats.datasource.Category;
 import com.nidefawl.Stats.datasource.PlayerStat;
 
-import de.sockenklaus.XmlStats.Datasource.StatsDS;
+import de.sockenklaus.XmlStats.Datasource.UserstatsDS;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -46,7 +46,7 @@ import de.sockenklaus.XmlStats.Datasource.StatsDS;
 public class XmlWorkerUserstats extends XmlWorker {
 	
 	/** The stats ds. */
-	private StatsDS statsDS;
+	private UserstatsDS statsDS;
 	private hModItemResolver itemResolver;
 	private String[] resolveCats;
 	
@@ -54,7 +54,7 @@ public class XmlWorkerUserstats extends XmlWorker {
 	 * Instantiates a new xml worker userstats.
 	 */
 	public XmlWorkerUserstats(){
-		this.statsDS = new StatsDS();
+		this.statsDS = new UserstatsDS();
 		itemResolver = new hModItemResolver(new File(statsDS.getDataFolder(),"items.txt"));
 		resolveCats = new String[]{"blockdestroy", "blockcreate", "itemdrop", "itempickup"};
 	}
