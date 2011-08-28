@@ -17,6 +17,7 @@ package de.sockenklaus.XmlStats.XmlWorkers;
 import java.io.File;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.List;
@@ -45,13 +46,17 @@ import de.sockenklaus.XmlStats.Datasource.StatsDS;
 public class XmlWorkerUserstats extends XmlWorker {
 	
 	/** The stats ds. */
-	StatsDS statsDS = new StatsDS();
+	private StatsDS statsDS;
+	private hModItemResolver itemResolver;
+	private String[] resolveCats;
 	
 	/**
 	 * Instantiates a new xml worker userstats.
 	 */
 	public XmlWorkerUserstats(){
 		this.statsDS = new StatsDS();
+		itemResolver = new hModItemResolver(new File(statsDS.getDataFolder(),"items.txt"));
+		resolveCats = new String[]{"blockdestroy", "blockcreate", "itemdrop", "itempickup"};
 	}
 	
 	
@@ -76,12 +81,44 @@ public class XmlWorkerUserstats extends XmlWorker {
 			/*
 			 * Hier wird das XML aufgebaut
 			 */
+			if (!parameters.containsKey("player")){
+				// Generate a summarized XML
+				HashMap<String, HashMap<String, Integer>> addedStats = statsDS.getAddedStats();
 				
-			for(String playerName : statsDS.getStats().keySet()){
-				if (!parameters.containsKey("player") || (parameters.containsKey("player") && parameters.get("player").contains(playerName))){
-					root.appendChild(getPlayerElement(playerName, doc));
+				Element elem_player = doc.createElement("player");
+				elem_player.setAttribute("name", "*");
+				
+				for (String catName : addedStats.keySet()){
+					if (!catName.equals("stats")){
+						Element elem_cat = doc.createElement("category");
+						elem_cat.setAttribute("name", catName);
+						
+						for(String entryName : addedStats.get(catName).keySet()){
+							Element elem_stat = doc.createElement("stat");
+							elem_stat.setAttribute("name", entryName);
+							
+							if(Arrays.asList(resolveCats).contains(catName)){
+								elem_stat.setAttribute("id", String.valueOf(itemResolver.getItem(entryName)));
+							}
+							elem_stat.setAttribute("value", String.valueOf(addedStats.get(catName).get(entryName)));
+							
+							elem_cat.appendChild(elem_stat);
+						}
+						elem_player.appendChild(elem_cat);
+					}
+				}
+				root.appendChild(elem_player);
+				
+			}
+			else {
+				// Generate the XML for the given user(s)
+				for(String playerName : statsDS.getStats().keySet()){
+					if (parameters.containsKey("player") && parameters.get("player").contains(playerName)){
+						root.appendChild(getPlayerElement(playerName, doc));
+					}
 				}
 			}
+			
 			/*
 			 * Hier endet der XML-Aufbau
 			 */
@@ -106,9 +143,6 @@ public class XmlWorkerUserstats extends XmlWorker {
 	 * @return 				Returns a XML subtree for the given playerName.
 	 */
 	private Element getPlayerElement(String playerName, Document doc){
-		hModItemResolver itemResolver = new hModItemResolver(new File(statsDS.getDataFolder(),"items.txt"));
-		String[] resolveCats = {"blockdestroy", "blockcreate", "itemdrop", "itempickup"};
-		
 		PlayerStat player_stats = statsDS.getStats().get(playerName);
 		
 		Element elem_player = doc.createElement("player");
