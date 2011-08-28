@@ -22,6 +22,7 @@ import com.iConomy.system.Account;
 import com.iConomy.system.Holdings;
 
 import de.sockenklaus.XmlStats.XmlStats;
+import de.sockenklaus.XmlStats.XmlStatsRegistry;
 
 /**
  * The Class MoneyDS.
@@ -32,7 +33,7 @@ public class MoneyDS extends Datasource {
 	private ArrayList<String> allPlayers;
 	
 	public MoneyDS(){
-		this.iConomy = XmlStats.getiConomyPlugin();
+		this.iConomy = (iConomy)XmlStatsRegistry.get("iconomy");
 		this.allPlayers = fetchAllPlayers();
 	}
 	

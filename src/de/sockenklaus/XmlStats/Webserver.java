@@ -26,7 +26,7 @@ import de.sockenklaus.XmlStats.XmlWorkers.*;
  * The Class WebServer.
  */
 @SuppressWarnings("restriction")
-public class WebServer {
+public class Webserver {
 
 	private InetSocketAddress address;
 	private HttpServer server = null;
@@ -37,7 +37,7 @@ public class WebServer {
 	 * @param port the port
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public WebServer(int port) throws IOException {
+	public Webserver(int port) throws IOException {
 		this.address = new InetSocketAddress(port);
 		
 		server = HttpServer.create(address, 0);

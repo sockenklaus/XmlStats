@@ -23,8 +23,6 @@ import java.util.ArrayList;
  */
 public abstract class Datasource {
 	
-	
-	
 	/**
 	 * Fetch all players.
 	 *

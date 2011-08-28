@@ -23,7 +23,7 @@ import com.nidefawl.Stats.datasource.Category;
 import com.nidefawl.Stats.datasource.PlayerStat;
 import com.nidefawl.Stats.datasource.PlayerStatSQL;
 
-import de.sockenklaus.XmlStats.XmlStats;
+import de.sockenklaus.XmlStats.XmlStatsRegistry;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -39,7 +39,7 @@ public class UserstatsDS extends Datasource {
 	 * Instantiates a new stats ds.
 	 */
 	public UserstatsDS() {
-		this.statsPlugin = XmlStats.getStatsPlugin();
+		this.statsPlugin = (Stats)XmlStatsRegistry.get("stats");
 		this.allPlayerNames = fetchAllPlayers();
 		this.stats = fetchPlayerStats(allPlayerNames);
 	}

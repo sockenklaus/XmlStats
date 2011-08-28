@@ -38,24 +38,18 @@ public class XmlStats extends JavaPlugin {
 	private final static double version = 0.01;
 	private final static String logprefix = "[XmlStats]";
 	private boolean enabled = false;
-	private static Stats Stats = null;
-	private static iConomy iConomy = null;
-	private static Server serverRef;
-	private WebServer webServer;
-	private Settings settings;
 	
 	/* (non-Javadoc)
 	 * @see org.bukkit.plugin.Plugin#onDisable()
 	 */
 	@Override
 	public void onDisable() {
-		if(this.enabled && this.webServer.isRunning()){
+		Webserver webserverTemp = (Webserver)XmlStatsRegistry.get("webserver");
+		
+		if(this.enabled && webserverTemp.isRunning()){
 			this.enabled = false;
-			
-			iConomy = null;
-			Stats = null;
-			
-			this.webServer.stopServer();
+				
+			webserverTemp.stopServer();
 			
 			getServer().getScheduler().cancelTasks(this);
 			
@@ -70,15 +64,23 @@ public class XmlStats extends JavaPlugin {
 	public void onEnable() {
 	
 		getDataFolder().mkdirs();
+				
+		XmlStatsRegistry.put("settings", new Settings(this));
+		XmlStatsRegistry.put("xmlstats", this);
 		
-		serverRef = getServer();
-		this.settings = new Settings(this);
+		Settings settingsTemp = (Settings)XmlStatsRegistry.get("settings");
+		
+		LogDebug("Settings read:");
+		LogDebug("options.webserver-enabled: "+settingsTemp.getBoolean("options.webserver-enabled"));
+		LogDebug("options.webserver-port: "+settingsTemp.getInt("options.webserver-port"));
+		LogDebug("options.gzip-enabled: "+settingsTemp.getBoolean("options.gzip-enabled"));
+		LogDebug("options.verbose-enabled: "+settingsTemp.getBoolean("options.verbose-enabled"));
 		
 		this.hookPlugins();
 
-		if (this.settings.getBoolean("options.webserver-enabled")){
+		if (settingsTemp.getBoolean("options.webserver-enabled")){
 			try {
-				this.webServer = new WebServer(settings.getInt("options.webserver-port"));
+				XmlStatsRegistry.put("webserver", new Webserver(settingsTemp.getInt("options.webserver-port")));
 					
 				this.enabled = true;
 				LogInfo("Plugin Enabled");
@@ -90,7 +92,7 @@ public class XmlStats extends JavaPlugin {
 			}			
 		}
 		else {
-			LogWarn("Webserver ist derzeit in der "+settings.getSettingsFilename()+" deaktiviert.");
+			LogWarn("Webserver ist derzeit in der "+settingsTemp.getSettingsFilename()+" deaktiviert.");
 		}
 		
 		
@@ -123,55 +125,20 @@ public class XmlStats extends JavaPlugin {
 		log.log(Level.WARNING, logprefix + " "+ Message);
 	}
 	
-	/**
-	 * Gets the stats plugin.
-	 *
-	 * @return the stats plugin
-	 */
-	public static Stats getStatsPlugin(){
-		return Stats;
-	}
-	
-	/**
-	 * Gets the server ref.
-	 *
-	 * @return the server ref
-	 */
-	public static Server getServerRef(){
-		return serverRef;
-	}
-	
-	public static iConomy getiConomyPlugin(){
-		return iConomy;
-	}
-	
-	public void onPluginDisable(PluginDisableEvent event){
-		if(iConomy != null){
-			if(event.getPlugin().getDescription().getName().equals("iConomy")){
-				iConomy = null;
-				LogInfo("iConomy is disabled now. Unhooking.");
-			}
+	public static void LogDebug(String Message){
+		Settings settingsTemp = (Settings)XmlStatsRegistry.get("settings");
+		if(settingsTemp.getBoolean("options.verbose-enabled")){
+			log.log(Level.INFO, logprefix+"[DEBUG] "+Message);
 		}
-		if(Stats != null){
-			if(event.getPlugin().getDescription().getName().equals("Stats")){
-				Stats = null;
-				LogInfo("Stats is disabled now. Unhooking.");
-			}
-		}
-		
 	}
 	
-	public void onPluginEnable(PluginEnableEvent event){
-		this.hookPlugins();
-	}
-	
-	private void hookPlugins(){
+	protected void hookPlugins(){
 		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
 		Plugin iConomyTemp = getServer().getPluginManager().getPlugin("iConomy");
 
         if(StatsTemp != null){
         	if(StatsTemp.isEnabled() && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats")){
-        		Stats = (Stats)StatsTemp;
+        		XmlStatsRegistry.put("stats", (Stats)StatsTemp);
         		LogInfo("Hooked into Stats!");
         	}
         }
@@ -180,25 +147,28 @@ public class XmlStats extends JavaPlugin {
         }
         if (iConomyTemp != null) {
             if (iConomyTemp.isEnabled() && iConomyTemp.getClass().getName().equals("com.iConomy.iConomy")) {
-                iConomy = (iConomy)iConomyTemp;
+                XmlStatsRegistry.put("iconomy", (iConomy)iConomyTemp);
                 LogInfo("Hooked into iConomy");
             }
         }
         else {
         	LogError("iConomy not found! Can't hook into it.");
         }
-	}
-	
+	}	
 	public static boolean isStatsHooked(){
-		if (Stats != null){
-			if(Stats.getClass().getName().equals("com.nidefawl.Stats.Stats") && Stats.isEnabled()) return true;
+		Stats StatsTemp = (Stats)XmlStatsRegistry.get("stats");
+		
+		if (StatsTemp != null){
+			if(StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats") && StatsTemp.isEnabled()) return true;
 		}
 		return false;
 	}
 	
 	public static boolean isiConomyHooked(){
-		if (iConomy != null){
-			if (iConomy.getClass().getName().equals("com.iConomy.iConomy") && iConomy.isEnabled()) return true;
+		iConomy iConomyTemp = (iConomy)XmlStatsRegistry.get("iconomy");
+		
+		if (iConomyTemp != null){
+			if (iConomyTemp.getClass().getName().equals("com.iConomy.iConomy") && iConomyTemp.isEnabled()) return true;
 		}
 		return false;
 	}
