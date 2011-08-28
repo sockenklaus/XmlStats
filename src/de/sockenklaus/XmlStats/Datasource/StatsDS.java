@@ -104,9 +104,15 @@ public class StatsDS extends Datasource {
 					
 					if(result.containsKey(catName)){
 						if(result.get(catName).containsKey(entryName)){
-							Integer tempInt = result.get(catName).get(entryName) + entry;
 							
-							result.get(catName).put(entryName, tempInt);
+							if(entryName.equals("lastlogin") || entryName.equals("lastlogout")){
+								result.get(catName).put(entryName, Math.max(result.get(catName).get(entryName), entry));
+							}
+							else {
+								Integer tempInt = result.get(catName).get(entryName) + entry;
+								result.get(catName).put(entryName, tempInt);
+							}
+
 						}
 						else {
 							result.get(catName).put(entryName, entry);

@@ -83,31 +83,8 @@ public class XmlWorkerUserstats extends XmlWorker {
 			 */
 			if (!parameters.containsKey("player")){
 				// Generate a summarized XML
-				HashMap<String, HashMap<String, Integer>> addedStats = statsDS.getAddedStats();
 				
-				Element elem_player = doc.createElement("player");
-				elem_player.setAttribute("name", "*");
-				
-				for (String catName : addedStats.keySet()){
-					if (!catName.equals("stats")){
-						Element elem_cat = doc.createElement("category");
-						elem_cat.setAttribute("name", catName);
-						
-						for(String entryName : addedStats.get(catName).keySet()){
-							Element elem_stat = doc.createElement("stat");
-							elem_stat.setAttribute("name", entryName);
-							
-							if(Arrays.asList(resolveCats).contains(catName)){
-								elem_stat.setAttribute("id", String.valueOf(itemResolver.getItem(entryName)));
-							}
-							elem_stat.setAttribute("value", String.valueOf(addedStats.get(catName).get(entryName)));
-							
-							elem_cat.appendChild(elem_stat);
-						}
-						elem_player.appendChild(elem_cat);
-					}
-				}
-				root.appendChild(elem_player);
+				root.appendChild(getAddedUpStats(doc));
 				
 			}
 			else {
@@ -170,6 +147,33 @@ public class XmlWorkerUserstats extends XmlWorker {
 			
 			elem_player.appendChild(elem_cat);
 		}
+		return elem_player;
+	}
+	
+	private Element getAddedUpStats(Document doc){
+		HashMap<String, HashMap<String, Integer>> addedStats = statsDS.getAddedStats();
+		
+		Element elem_player = doc.createElement("player");
+		elem_player.setAttribute("name", "*");
+		
+		for (String catName : addedStats.keySet()){
+			Element elem_cat = doc.createElement("category");
+			elem_cat.setAttribute("name", catName);
+				
+			for(String entryName : addedStats.get(catName).keySet()){
+				Element elem_stat = doc.createElement("stat");
+				elem_stat.setAttribute("name", entryName);
+					
+				if(Arrays.asList(resolveCats).contains(catName)){
+					elem_stat.setAttribute("id", String.valueOf(itemResolver.getItem(entryName)));
+				}
+				elem_stat.setAttribute("value", String.valueOf(addedStats.get(catName).get(entryName)));
+				
+				elem_cat.appendChild(elem_stat);
+			}
+			elem_player.appendChild(elem_cat);
+		}
+		
 		return elem_player;
 	}
 }
