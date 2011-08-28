@@ -30,9 +30,7 @@ import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
-import de.sockenklaus.XmlStats.Settings;
 import de.sockenklaus.XmlStats.XmlStats;
-import de.sockenklaus.XmlStats.XmlStatsRegistry;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -48,7 +46,6 @@ public abstract class XmlWorker implements HttpHandler {
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 		
 		Headers headers = exchange.getRequestHeaders();
-		Settings settingsTemp = (Settings)XmlStatsRegistry.get("settings");
 		
 		if("get".equalsIgnoreCase(exchange.getRequestMethod())){
 			String queryString = exchange.getRequestURI().getRawQuery();
@@ -109,7 +106,7 @@ public abstract class XmlWorker implements HttpHandler {
 	 * @return the map
 	 * @throws UnsupportedEncodingException the unsupported encoding exception
 	 */
-	public Map<String, List<String>> parseParameters(String queryString) throws UnsupportedEncodingException {
+	private Map<String, List<String>> parseParameters(String queryString) throws UnsupportedEncodingException {
 		Map<String, List<String>> result = new HashMap<String, List<String>>();
 		
 		if (queryString != null){

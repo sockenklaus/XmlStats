@@ -28,7 +28,7 @@ public abstract class Datasource {
 	 *
 	 * @return the array list
 	 */
-	protected ArrayList<String> fetchAllPlayers(){
+	public ArrayList<String> fetchAllPlayers(){
 		File[] files = new File("world/players").listFiles();
 		ArrayList<String> result = new ArrayList<String>();
 		

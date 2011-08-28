@@ -15,7 +15,6 @@
 package de.sockenklaus.XmlStats.Datasource;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.nidefawl.Stats.Stats;
@@ -32,16 +31,12 @@ import de.sockenklaus.XmlStats.XmlStatsRegistry;
 public class UserstatsDS extends Datasource {
 	
 	private Stats statsPlugin;
-	private ArrayList<String> allPlayerNames;
-	private HashMap<String, PlayerStat> stats = new HashMap<String, PlayerStat>();
 
 	/**
 	 * Instantiates a new stats ds.
 	 */
 	public UserstatsDS() {
 		this.statsPlugin = (Stats)XmlStatsRegistry.get("stats");
-		this.allPlayerNames = fetchAllPlayers();
-		this.stats = fetchPlayerStats(allPlayerNames);
 	}
 	
 	/**
@@ -62,39 +57,11 @@ public class UserstatsDS extends Datasource {
 		return this.statsPlugin.getDataFolder();
 	}
 	
-	/**
-	 * Fetch all player stats.
-	 *
-	 * @param pPlayerNames the player names
-	 * @return the hash map
-	 */
-	private HashMap<String, PlayerStat> fetchPlayerStats(ArrayList<String> pPlayerNames){
-		HashMap<String, PlayerStat> result = new HashMap<String, PlayerStat>();
-		
-		for (String playerName : pPlayerNames){
-						
-			PlayerStat ps = new PlayerStatSQL(playerName, statsPlugin);
-			ps.load();
-			result.put(playerName, ps);
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * Gets the stats.
-	 *
-	 * @return the stats
-	 */
-	public HashMap<String, PlayerStat> getStats(){
-		return this.stats;
-	}
-	
 	public HashMap<String, HashMap<String, Integer>> getAddedStats(){
 		HashMap <String, HashMap<String, Integer>> result = new HashMap<String, HashMap<String, Integer>>();
 		
-		for(String playerName : this.stats.keySet()){
-			PlayerStat player = this.stats.get(playerName);
+		for(String playerName : this.fetchAllPlayers()){
+			PlayerStat player = this.getPlayerStat(playerName);
 			
 			for(String catName : player.getCats()){
 				Category cat = player.get(catName);
@@ -129,8 +96,12 @@ public class UserstatsDS extends Datasource {
 		
 		return result;
 	}
-	
-	public void sortStats(){
+
+	public PlayerStat getPlayerStat(String playerName){
+		PlayerStat result = new PlayerStatSQL(playerName, this.statsPlugin);
 		
+		result.load();
+		
+		return result;
 	}
 }

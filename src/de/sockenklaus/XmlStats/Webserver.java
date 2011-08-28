@@ -37,13 +37,51 @@ public class Webserver {
 	 * @param port the port
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public Webserver(int port) throws IOException {
+	public Webserver() throws IOException {		
+		Settings settingsTemp = (Settings)XmlStatsRegistry.get("settings");
+		
+		this.start(settingsTemp.getInt("options.webserver-port"));
+	}
+	
+	/**
+	 * Stop server.
+	 */
+	public void stop() {
+		server.stop(0);
+		this.server = null;
+	}
+	
+	/**
+	 * Server running.
+	 *
+	 * @return true, if successful
+	 */
+	public boolean isRunning(){
+		return (this.server == null) ? false : true;
+	}
+	
+	public void reload() throws IOException {
+		this.stop();
+		
+		Settings settingsTemp = (Settings)XmlStatsRegistry.get("settings");
+		
+		this.start(settingsTemp.getInt("options.webserver-port"));
+	}
+	
+	private void start(int port) throws IOException {
+		this.address = null;
+		this.server = null;
+		
 		this.address = new InetSocketAddress(port);
 		
-		server = HttpServer.create(address, 0);
+		this.server = HttpServer.create(this.address, 0);
 		
-		server.createContext("/users.xml", new XmlWorkerUsers());
-		server.createContext("/userstats.xml", new XmlWorkerUserstats());
+		this.server.createContext("/users.xml", new XmlWorkerUsers());
+		
+		if(XmlStats.isStatsHooked()){
+			server.createContext("/userstats.xml", new XmlWorkerUserstats());
+			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /userstats.xml");
+		}
 		
 		if (XmlStats.isiConomyHooked()){
 			server.createContext("/money.xml", new XmlWorkerMoney());
@@ -54,21 +92,5 @@ public class Webserver {
 		}
 		
 		this.server.start();
-	}
-	
-	/**
-	 * Stop server.
-	 */
-	public void stopServer() {
-		server.stop(0);
-	}
-	
-	/**
-	 * Server running.
-	 *
-	 * @return true, if successful
-	 */
-	public boolean isRunning(){
-		return (this.server == null) ? false : true;
 	}
 }

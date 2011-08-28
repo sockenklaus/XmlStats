@@ -42,7 +42,6 @@ public class Settings {
 		else {
 			conf.setProperty("options.webserver-enabled", false);
 			conf.setProperty("options.webserver-port", 9123);
-			conf.setProperty("options.gzip-enabled", false);
 			conf.setProperty("options.verbose-enabled", false);
 			conf.save();
 		}
@@ -93,7 +92,7 @@ public class Settings {
 	 *
 	 * @return the settings filename
 	 */
-	public String getSettingsFilename(){
+	protected String getSettingsFilename(){
 		return configFilename;
 	}
 	

@@ -17,11 +17,8 @@ package de.sockenklaus.XmlStats;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.Server;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
-import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,7 +46,7 @@ public class XmlStats extends JavaPlugin {
 		if(this.enabled && webserverTemp.isRunning()){
 			this.enabled = false;
 				
-			webserverTemp.stopServer();
+			webserverTemp.stop();
 			
 			getServer().getScheduler().cancelTasks(this);
 			
@@ -77,10 +74,13 @@ public class XmlStats extends JavaPlugin {
 		LogDebug("options.verbose-enabled: "+settingsTemp.getBoolean("options.verbose-enabled"));
 		
 		this.hookPlugins();
+		
+		this.registerEvents();
+		
 
 		if (settingsTemp.getBoolean("options.webserver-enabled")){
 			try {
-				XmlStatsRegistry.put("webserver", new Webserver(settingsTemp.getInt("options.webserver-port")));
+				XmlStatsRegistry.put("webserver", new Webserver());
 					
 				this.enabled = true;
 				LogInfo("Plugin Enabled");
@@ -171,5 +171,12 @@ public class XmlStats extends JavaPlugin {
 			if (iConomyTemp.getClass().getName().equals("com.iConomy.iConomy") && iConomyTemp.isEnabled()) return true;
 		}
 		return false;
+	}
+	
+	private void registerEvents(){
+		XmlStatsServerListener listener = new XmlStatsServerListener(this);
+		
+		getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, listener, Priority.Monitor, this);
+		getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, listener, Priority.Monitor, this);
 	}
 }

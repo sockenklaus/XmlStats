@@ -59,8 +59,6 @@ public class XmlWorkerUserstats extends XmlWorker {
 		resolveCats = new String[]{"blockdestroy", "blockcreate", "itemdrop", "itempickup"};
 	}
 	
-	
-	
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
@@ -84,12 +82,12 @@ public class XmlWorkerUserstats extends XmlWorker {
 			if (!parameters.containsKey("player")){
 				// Generate a summarized XML
 				
-				root.appendChild(getAddedUpStats(doc));
+				root.appendChild(getAddedUpStatsElement(doc));
 				
 			}
 			else {
 				// Generate the XML for the given user(s)
-				for(String playerName : statsDS.getStats().keySet()){
+				for(String playerName : statsDS.fetchAllPlayers()){
 					if (parameters.containsKey("player") && parameters.get("player").contains(playerName)){
 						root.appendChild(getPlayerElement(playerName, doc));
 					}
@@ -120,7 +118,7 @@ public class XmlWorkerUserstats extends XmlWorker {
 	 * @return 				Returns a XML subtree for the given playerName.
 	 */
 	private Element getPlayerElement(String playerName, Document doc){
-		PlayerStat player_stats = statsDS.getStats().get(playerName);
+		PlayerStat player_stats = statsDS.getPlayerStat(playerName);
 		
 		Element elem_player = doc.createElement("player");
 		elem_player.setAttribute("name", playerName);
@@ -150,7 +148,7 @@ public class XmlWorkerUserstats extends XmlWorker {
 		return elem_player;
 	}
 	
-	private Element getAddedUpStats(Document doc){
+	private Element getAddedUpStatsElement(Document doc){
 		HashMap<String, HashMap<String, Integer>> addedStats = statsDS.getAddedStats();
 		
 		Element elem_player = doc.createElement("player");
