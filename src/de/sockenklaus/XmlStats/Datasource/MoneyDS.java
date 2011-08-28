@@ -59,9 +59,9 @@ public class MoneyDS extends Datasource {
 					Holdings balance = account.getHoldings();
 					result = balance.balance();
 				}
-				else XmlStats.LogError("The player has an account but it isn't valid. Bad data will return.");
+				else XmlStats.LogWarn("The player \""+playerName+"\" has an account but it isn't valid. Bad data will return.");
 			}
-			else XmlStats.LogError("This player doesn't have a bank account and this action will return bad data");
+			else XmlStats.LogWarn("The player \""+playerName+"\" doesn't have a bank account and this action will return bad data");
 		}
 		else {
 			XmlStats.LogError("Something went wrong! /money.xml shouldn't be enabled but it's datasource was called! This will return bad results.");

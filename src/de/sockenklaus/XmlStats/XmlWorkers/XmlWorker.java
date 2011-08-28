@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -55,59 +56,39 @@ public abstract class XmlWorker implements HttpHandler {
 			byte[] byteResponse = null;
 			
 			try {
-				
 				parameters = parseParameters(queryString);
-				
 			} catch(UnsupportedEncodingException ex){
-				XmlStats.LogError("Fehler beim Parsen des HTTP-Query-Strings.");
-				XmlStats.LogError(ex.getMessage());
+				XmlStats.LogWarn("Fehler beim Parsen des HTTP-Query-Strings.");
+				XmlStats.LogWarn(ex.getMessage());
 			}
 			
 			xmlResponse = getXML(parameters);
-						
+			
+			
 			/*
 			 * Check if the clients sends the header "Accept-encoding", the option "gzip-enabled" is true and the clients supports gzip.
 			 */
-			if(headers.containsKey("Accept-encoding") && settingsTemp.getBoolean("options.gzip-enabled")){
-				XmlStats.LogDebug("Compression seems to be accepted by the client and activated in this plugin.");
-				List<String> header = headers.get("Accept-encoding");
-				try {
-					XmlStats.LogDebug("There are "+header.size()+" values in the header");
-					XmlStats.LogDebug("Let's take a look at the headers values:");
-				}
-				catch (Exception e){
-					XmlStats.LogError(e.getMessage());
-					e.printStackTrace();
-				}
-				for(String val : header){
-					XmlStats.LogDebug("Accept-encoding: "+val);
-					if(val.toLowerCase().indexOf("gzip") > -1){
-						ByteArrayOutputStream out = new ByteArrayOutputStream();
-						try {
-							XmlStats.LogDebug("OK... let's try gzip compression...");
-							XmlStats.LogDebug("Actual size of the xml file: "+xmlResponse.getBytes().length+"Bytes");
-							GZIPOutputStream gzip = new GZIPOutputStream(out);
-							gzip.write(xmlResponse.getBytes());
-							gzip.close();
-							byteResponse = out.toByteArray();
-							XmlStats.LogDebug("Compressed size of the xml file: "+byteResponse.length+"Bytes");
-							exchange.getResponseHeaders().add("Content-encoding", "gzip");
-							
-						} catch (Exception e) {
-							XmlStats.LogError("GZIP-Compression failed! Falling back to non-compressed output.");
-							XmlStats.LogError(e.getMessage());
-							e.printStackTrace();
-							byteResponse = xmlResponse.getBytes();
-						}
-					}
-				}
+			
+			
+			
+			if(parameters.containsKey("gzip") && parameters.get("gzip").contains("true")){
+				XmlStats.LogDebug("Raw gzip requested.");
 				
+				HttpContext context = exchange.getHttpContext();
+				String filename = context.getPath().substring(1);
+				
+				byteResponse = compressData(xmlResponse.getBytes());
+				exchange.getResponseHeaders().set("Content-type", "application/gzip");
+				exchange.getResponseHeaders().set("Content-disposition", "attachment; filename="+filename+".gzip");
 			}
-			if (byteResponse == null || byteResponse.length == 0) {
-				XmlStats.LogDebug("Compression is not enabled or doesn't work properly. Fallback to uncompressed output.");
+			else if(clientAcceptsGzip(headers)) {
+				byteResponse = compressData(xmlResponse.getBytes());
+				exchange.getResponseHeaders().set("Content-encoding", "gzip");
+			}	
+			else {
 				byteResponse = xmlResponse.getBytes();
 			}
-						
+									
 			try {
 				exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, byteResponse.length);
 		        exchange.getResponseBody().write(byteResponse);
@@ -171,4 +152,40 @@ public abstract class XmlWorker implements HttpHandler {
 	 * @return the xML
 	 */
 	abstract String getXML(Map<String, List<String>> parameters);
+	
+	private byte[] compressData(byte[] input){
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		byte[] output;
+		
+		try {
+			XmlStats.LogDebug("OK... let's try gzip compression...");
+			XmlStats.LogDebug("Actual size of the xml file: "+input.length+"Bytes");
+			GZIPOutputStream gzip = new GZIPOutputStream(out);
+			gzip.write(input);
+			gzip.close();
+			output = out.toByteArray();
+			XmlStats.LogDebug("Compressed size of the xml file: "+output.length+"Bytes");
+		}
+		catch(IOException e){
+			XmlStats.LogError("GZIP-Compression failed! Returning empty byte[]");
+			output = new byte[0];
+		}
+		
+		return output;
+	}
+
+	private boolean clientAcceptsGzip(Headers headers){
+		if(headers.containsKey("Accept-encoding")){
+			List<String> header = headers.get("Accept-encoding");
+			
+			for(String val : header){
+				if(val.toLowerCase().indexOf("gzip") > -1){
+					return true;
+				}
+			}
+			
+		}
+		
+		return false;
+	}
 }

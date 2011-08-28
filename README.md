@@ -27,3 +27,7 @@ To fetch the stats of the given user:
 To get data provided by the iConomy plugin:
     
     http://server:port/money.xml
+
+You can request gzip compressed files by using the parameter gzip=true. This works on all files:
+
+	http://server:port/userstats.xml?gzip=true
