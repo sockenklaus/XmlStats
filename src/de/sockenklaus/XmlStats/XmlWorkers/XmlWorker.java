@@ -119,11 +119,11 @@ public abstract class XmlWorker implements HttpHandler {
 				String value = null;
 				
 				if(param.length > 0){
-					key = URLDecoder.decode(param[0], System.getProperty("file.encoding"));
+					key = URLDecoder.decode(param[0].toLowerCase(), System.getProperty("file.encoding"));
 				}
 				
 				if(param.length > 1){
-					value = URLDecoder.decode(param[1], System.getProperty("file.encoding"));
+					value = URLDecoder.decode(param[1].toLowerCase(), System.getProperty("file.encoding"));
 				}
 				
 				if (result.containsKey(key)){
