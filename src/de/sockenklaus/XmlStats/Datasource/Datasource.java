@@ -36,7 +36,7 @@ public abstract class Datasource {
 			int whereDot = files[i].getName().lastIndexOf('.');
 			
 			if (0 < whereDot && whereDot <= files[i].getName().length() - 2){
-				String playerName = files[i].getName().substring(0, whereDot).toLowerCase();
+				String playerName = files[i].getName().substring(0, whereDot);
 				
 				result.add(playerName);
 			}

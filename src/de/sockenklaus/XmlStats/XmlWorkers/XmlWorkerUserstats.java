@@ -88,7 +88,7 @@ public class XmlWorkerUserstats extends XmlWorker {
 			else {
 				// Generate the XML for the given user(s)
 				for(String playerName : statsDS.fetchAllPlayers()){
-					if (parameters.containsKey("player") && parameters.get("player").contains(playerName)){
+					if (parameters.containsKey("player") && parameters.get("player").contains(playerName.toLowerCase())){
 						root.appendChild(getPlayerElement(playerName, doc));
 					}
 				}
