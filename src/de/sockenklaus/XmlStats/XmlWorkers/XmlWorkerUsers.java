@@ -15,6 +15,8 @@
 package de.sockenklaus.XmlStats.XmlWorkers;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.List;
@@ -26,11 +28,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.bukkit.entity.Player;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.nidefawl.Stats.Stats;
 
+import de.sockenklaus.XmlStats.XmlStats;
+import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Datasource.UsersDS;
 
 // TODO: Auto-generated Javadoc
@@ -60,6 +65,22 @@ public class XmlWorkerUsers extends XmlWorker {
 			root.setAttribute("count", String.valueOf(users.getAllPlayers().size()));
 			doc.appendChild(root);
 			
+			/*
+			 * Get list online player names
+			 */
+			XmlStats pluginTemp= (XmlStats)XmlStatsRegistry.get("xmlstats");
+			
+			Player[] onlinePlayers = pluginTemp.getServer().getOnlinePlayers();
+			List<String> onlinePlayerNames = new ArrayList<String>();
+			
+			if (onlinePlayers != null){
+				for (int i = 0; i < onlinePlayers.length; i++){
+					onlinePlayerNames.add(onlinePlayers[i].getName());
+				}
+			}
+			/*
+			 * Got list of online player names
+			 */
 			
 			/*
 			 * Hier wird das XML aufgebaut
@@ -69,7 +90,9 @@ public class XmlWorkerUsers extends XmlWorker {
 				
 				Element elem_player = doc.createElement("player");
 				elem_player.setAttribute("name", playerName);
-							
+				
+				elem_player.setAttribute("status", onlinePlayerNames.contains(playerName) ? "online":"offline");
+				
 				root.appendChild(elem_player);
 			}
 			/*
