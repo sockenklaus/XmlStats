@@ -32,7 +32,7 @@ import com.nidefawl.Stats.Stats;
 public class XmlStats extends JavaPlugin {
 
 	private final static Logger log = Logger.getLogger("Minecraft");
-	private final static double version = 0.01;
+	private String version;
 	private final static String logprefix = "[XmlStats]";
 	private boolean enabled = false;
 	
@@ -59,7 +59,8 @@ public class XmlStats extends JavaPlugin {
 	 */
 	@Override
 	public void onEnable() {
-	
+		this.version = getDescription().getVersion();
+		
 		getDataFolder().mkdirs();
 				
 		XmlStatsRegistry.put("settings", new Settings(this));
@@ -83,7 +84,7 @@ public class XmlStats extends JavaPlugin {
 				XmlStatsRegistry.put("webserver", new Webserver());
 					
 				this.enabled = true;
-				LogInfo("Plugin Enabled");
+				LogInfo("XmStats "+this.version+" enabled");
 			}
 			catch (Exception ex){
 				LogError("Fehler beim Erstellen des Webservers:");

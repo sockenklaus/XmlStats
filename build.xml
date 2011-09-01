@@ -1,56 +1,71 @@
 <?xml version="1.0"?>
- <project name="XmlStats" basedir="." default="build">
-  <property name="build.classes" value="bin" />
-  <property name="build.lib" value="lib" />
-  <property name="java.dir" value="." />
-  <property name="name" value="XmlStats" />
-  <property name="manifest" value="MANIFEST.MF" />
-  <property name="craftbukkit.dir" value="C:/Users/socrates/AppData/Roaming/.craftbukkit" />
- 
-  <path id="classpath">
-      <pathelement location="lib/" />
-   </path>
- 
-  <!-- Anwendung bauen  -->
-  <target name="build" depends="clean" description="Baut die komplette Anwendung">
-    <!-- Verzeichis anlegen -->
-    <mkdir dir="${build.classes}"/>
- 
-    <!-- Quelltext kompilieren -->
-    <javac srcdir="${java.dir}"
-           destdir="${build.classes}"
-           debug="false"
-           deprecation="true"
-           optimize="true" >
-      <classpath refid="classpath" />
-    </javac>
- 
-    <!-- Kopiert notwendige Dateien -->
-    <copy todir="${build.classes}">
-      <fileset dir="${java.dir}">
-        <include name="**/*.properties" />
-        <include name="**/*.gif" />
-      </fileset>
-    </copy>
- 
-    <!-- Baut die JAR-Datei -->
-    <jar jarfile="${build.lib}/${name}.jar" manifest="${manifest}">
-      <fileset dir="${build.classes}"/>
-    </jar>
-  </target>
- 
-  <!-- Aufräumen  -->
-  <target name="clean" description="Räumt die temporär angelegten Dateien weg">
-    <!-- Löscht Dateien -->
-    <delete dir="${build.dir}" />
-    <delete dir="${dist.base}" />
-    <delete dir="${defaultdist.dir}" />
-    <delete> 
-      <fileset dir="." includes="**/*~" defaultexcludes="no"/>
-    </delete>
-  </target>
+<project name="XmlStats" basedir="." default="build">
  	
- 	<target name="copy" description="Copy ${name}.jar to craftbukkit plugin dir" depends="build">
- 		<copy file="${build.lib}/${name}.jar" tofile="${craftbukkit.dir}/plugins/${name}.jar" />
+	<property name="bin" value="bin" />
+	<property name="dist" value="dist" />
+	<property name="src" value="src" />
+	<property name="name" value="XmlStats" />
+	<property name="version" value="0.1" />
+	<property name="package" value="de/sockenklaus/XmlStats" />
+	<property name="resources" value="resources" />
+ 
+	<path id="classpath">
+    	<pathelement location="lib/" />
+   	</path>
+	
+	<buildnumber file=".build.number" />
+  	
+	<!-- Anwendung bauen  -->
+	<target name="build" description="Build the plugin" depends="zip" />
+ 	
+ 	<!-- Build a jar file -->
+	<target name="jar" depends="compile">
+		
+		
+		<!-- this is some ugly plugin.yml-writing -->
+		<echo file="${src}/plugin.yml">name: ${name}
+main: de.sockenklaus.XmlStats.XmlStats
+version: ${version}-b${build.number}
+author: sockenklaus</echo>
+ 		
+		<jar jarfile="${dist}/${name}.jar">
+			<fileset dir="${bin}"/>
+ 			<fileset file="src/plugin.yml" />
+		</jar>
+	</target>
+ 	
+ 	<!-- Clean up -->
+	<target name="clean.dist" description="Deletes temporary build files">
+		<delete dir="${dist}" />
+  	</target>
+ 	
+ 	<!-- Compile the source code -->
+ 	<target name="compile" depends="clean.classes, clean.dist">
+ 		 		
+ 		<mkdir dir="bin" />
+ 	   	<javac srcdir="${src}"
+ 	    	destdir="${bin}"
+ 	        debug="false"
+ 	        deprecation="true"
+ 	        optimize="true" >
+			<classpath refid="classpath" />
+ 	   	</javac>
  	</target>
+
+	<!-- Delete temporary build files -->
+	<target name="clean.classes" description="Deletes temporary build files">
+	    <delete dir="${bin}" />
+	    <delete> 
+	    	<fileset dir="." includes="**/*~" defaultexcludes="no"/>
+	    </delete>
+	</target>
+	
+	<!-- build a zip file -->
+	<target name="zip" depends="jar" description="Zip .jar and config.yml into a zip file">
+		<zip destfile="${dist}/${name}-${version}-b${build.number}.zip">
+			<fileset dir="${dist}" includes="${name}.jar" />
+			<zipfileset dir="${resources}" includes="config.yml" prefix="${name}" />
+		</zip>
+	</target>
+	
 </project>

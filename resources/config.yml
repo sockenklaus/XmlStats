@@ -1,0 +1,4 @@
+options:
+    webserver-enabled: true
+    webserver-port: 9123
+    verbose-enabled: true
