@@ -8,6 +8,7 @@
 	<property name="version" value="0.1" />
 	<property name="package" value="de/sockenklaus/XmlStats" />
 	<property name="resources" value="resources" />
+	<property name="author" value="sockenklaus" />
  
 	<path id="classpath">
     	<pathelement location="lib/" />
@@ -20,17 +21,18 @@
  	
  	<!-- Build a jar file -->
 	<target name="jar" depends="compile">
-		
-		
-		<!-- this is some ugly plugin.yml-writing -->
-		<echo file="${src}/plugin.yml">name: ${name}
-main: de.sockenklaus.XmlStats.XmlStats
-version: ${version}-b${build.number}
-author: sockenklaus</echo>
+		<copy file="${resources}/plugin.yml" tofile="${bin}/plugin.yml">
+			<filterchain>
+				<replacetokens>
+					<token key="VERSION" value="${version}-b${build.number}" />
+					<token key="NAME" value="${name}" />
+					<token key="AUTHOR" value="${author}" />
+				</replacetokens>
+			</filterchain>
+		</copy>
  		
 		<jar jarfile="${dist}/${name}.jar">
 			<fileset dir="${bin}"/>
- 			<fileset file="src/plugin.yml" />
 		</jar>
 	</target>
  	

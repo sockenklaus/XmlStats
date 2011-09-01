@@ -1,0 +1,8 @@
+name: @NAME@
+main: de.@AUTHOR@.@NAME@.@NAME@
+version: @VERSION@
+author: @AUTHOR@
+commands:
+    xmlstats:
+        description: The basic command.
+        usage: /<command> [reload]

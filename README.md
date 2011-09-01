@@ -10,6 +10,14 @@ To install the plugin, simply place the compiled **XmlStats.jar** in your server
     
 ## Usage
 
+### Game side
+
+At this time of the development you are only able to reload the plugin without reloading the whole server:
+
+	/xmlstats reload
+
+### Browser side
+
 Afterwards you can access the following xml files:
 
 For a list of all known players on your server:

@@ -25,7 +25,6 @@ import de.sockenklaus.XmlStats.XmlWorkers.*;
 /**
  * The Class WebServer.
  */
-@SuppressWarnings("restriction")
 public class Webserver {
 
 	private InetSocketAddress address;

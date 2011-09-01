@@ -17,6 +17,8 @@ package de.sockenklaus.XmlStats;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.Plugin;
@@ -45,6 +47,8 @@ public class XmlStats extends JavaPlugin {
 		
 		if(this.enabled && webserverTemp.isRunning()){
 			this.enabled = false;
+			
+			XmlStatsRegistry.flush();
 				
 			webserverTemp.stop();
 			
@@ -126,6 +130,11 @@ public class XmlStats extends JavaPlugin {
 		log.log(Level.WARNING, logprefix + " "+ Message);
 	}
 	
+	/**
+	 * Log debug.
+	 *
+	 * @param Message the message
+	 */
 	public static void LogDebug(String Message){
 		Settings settingsTemp = (Settings)XmlStatsRegistry.get("settings");
 		if(settingsTemp.getBoolean("options.verbose-enabled")){
@@ -133,6 +142,9 @@ public class XmlStats extends JavaPlugin {
 		}
 	}
 	
+	/**
+	 * Hook plugins.
+	 */
 	protected void hookPlugins(){
 		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
 		Plugin iConomyTemp = getServer().getPluginManager().getPlugin("iConomy");
@@ -156,6 +168,12 @@ public class XmlStats extends JavaPlugin {
         	LogError("iConomy not found! Can't hook into it.");
         }
 	}	
+	
+	/**
+	 * Checks if is stats hooked.
+	 *
+	 * @return true, if is stats hooked
+	 */
 	public static boolean isStatsHooked(){
 		Stats StatsTemp = (Stats)XmlStatsRegistry.get("stats");
 		
@@ -165,6 +183,11 @@ public class XmlStats extends JavaPlugin {
 		return false;
 	}
 	
+	/**
+	 * Checks if is i conomy hooked.
+	 *
+	 * @return true, if is i conomy hooked
+	 */
 	public static boolean isiConomyHooked(){
 		iConomy iConomyTemp = (iConomy)XmlStatsRegistry.get("iconomy");
 		
@@ -174,10 +197,39 @@ public class XmlStats extends JavaPlugin {
 		return false;
 	}
 	
+	/**
+	 * Register events.
+	 */
 	private void registerEvents(){
 		XmlStatsServerListener listener = new XmlStatsServerListener(this);
 		
 		getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, listener, Priority.Monitor, this);
 		getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, listener, Priority.Monitor, this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.bukkit.plugin.java.JavaPlugin#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 */
+	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
+		
+		if(commandLabel.equalsIgnoreCase("xmlstats")){
+			if(sender.isOp() && args.length == 1 && args[0].equalsIgnoreCase("reload")){
+				sender.sendMessage("Reloading the XmlStats plugin...");
+				LogInfo("Reloading the XmlStats plugin...");
+				this.reload();
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	/**
+	 * Reload.
+	 */
+	private void reload() {
+		this.onDisable();
+		this.onEnable();
+		
 	}
 }
