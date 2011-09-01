@@ -16,7 +16,6 @@ package de.sockenklaus.XmlStats.XmlWorkers;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.List;

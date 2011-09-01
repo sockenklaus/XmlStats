@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+ <project name="XmlStats" basedir="." default="build">
+  <property name="build.classes" value="bin" />
+  <property name="build.lib" value="lib" />
+  <property name="java.dir" value="." />
+  <property name="name" value="XmlStats" />
+  <property name="manifest" value="MANIFEST.MF" />
+  <property name="craftbukkit.dir" value="C:/Users/socrates/AppData/Roaming/.craftbukkit" />
+ 
+  <path id="classpath">
+      <pathelement location="lib/" />
+   </path>
+ 
+  <!-- Anwendung bauen  -->
+  <target name="build" depends="clean" description="Baut die komplette Anwendung">
+    <!-- Verzeichis anlegen -->
+    <mkdir dir="${build.classes}"/>
+ 
+    <!-- Quelltext kompilieren -->
+    <javac srcdir="${java.dir}"
+           destdir="${build.classes}"
+           debug="false"
+           deprecation="true"
+           optimize="true" >
+      <classpath refid="classpath" />
+    </javac>
+ 
+    <!-- Kopiert notwendige Dateien -->
+    <copy todir="${build.classes}">
+      <fileset dir="${java.dir}">
+        <include name="**/*.properties" />
+        <include name="**/*.gif" />
+      </fileset>
+    </copy>
+ 
+    <!-- Baut die JAR-Datei -->
+    <jar jarfile="${build.lib}/${name}.jar" manifest="${manifest}">
+      <fileset dir="${build.classes}"/>
+    </jar>
+  </target>
+ 
+  <!-- Aufräumen  -->
+  <target name="clean" description="Räumt die temporär angelegten Dateien weg">
+    <!-- Löscht Dateien -->
+    <delete dir="${build.dir}" />
+    <delete dir="${dist.base}" />
+    <delete dir="${defaultdist.dir}" />
+    <delete> 
+      <fileset dir="." includes="**/*~" defaultexcludes="no"/>
+    </delete>
+  </target>
+ 	
+ 	<target name="copy" description="Copy ${name}.jar to craftbukkit plugin dir" depends="build">
+ 		<copy file="${build.lib}/${name}.jar" tofile="${craftbukkit.dir}/plugins/${name}.jar" />
+ 	</target>
+</project>
