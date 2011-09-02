@@ -5,7 +5,7 @@
 	<property name="dist" value="dist" />
 	<property name="src" value="src" />
 	<property name="name" value="XmlStats" />
-	<property name="version" value="0.1" />
+	<property name="version" value="0.2" />
 	<property name="package" value="de/sockenklaus/XmlStats" />
 	<property name="resources" value="resources" />
 	<property name="author" value="sockenklaus" />

@@ -36,7 +36,6 @@ import de.sockenklaus.XmlStats.XmlStats;
 /**
  * The Class XmlWorker.
  */
-@SuppressWarnings("restriction")
 public abstract class XmlWorker implements HttpHandler {
 	
 	/* (non-Javadoc)
