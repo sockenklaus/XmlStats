@@ -40,9 +40,9 @@ public class Settings {
 			conf.load();
 		} 
 		else {
-			conf.setProperty("options.webserver-enabled", false);
+			conf.setProperty("options.webserver-enabled", true);
 			conf.setProperty("options.webserver-port", 9123);
-			conf.setProperty("options.verbose-enabled", false);
+			conf.setProperty("options.verbose-enabled", true);
 			conf.save();
 		}
 	}

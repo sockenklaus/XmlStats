@@ -75,14 +75,10 @@ public class XmlStats extends JavaPlugin {
 		LogDebug("Settings read:");
 		LogDebug("options.webserver-enabled: "+settingsTemp.getBoolean("options.webserver-enabled"));
 		LogDebug("options.webserver-port: "+settingsTemp.getInt("options.webserver-port"));
-		LogDebug("options.gzip-enabled: "+settingsTemp.getBoolean("options.gzip-enabled"));
 		LogDebug("options.verbose-enabled: "+settingsTemp.getBoolean("options.verbose-enabled"));
 		
 		this.hookPlugins();
 		
-		this.registerEvents();
-		
-
 		if (settingsTemp.getBoolean("options.webserver-enabled")){
 			try {
 				XmlStatsRegistry.put("webserver", new Webserver());
@@ -196,28 +192,23 @@ public class XmlStats extends JavaPlugin {
 		}
 		return false;
 	}
-	
-	/**
-	 * Register events.
-	 */
-	private void registerEvents(){
-		XmlStatsServerListener listener = new XmlStatsServerListener(this);
 		
-		getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, listener, Priority.Monitor, this);
-		getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, listener, Priority.Monitor, this);
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.bukkit.plugin.java.JavaPlugin#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
 		
 		if(commandLabel.equalsIgnoreCase("xmlstats")){
-			if(sender.isOp() && args.length == 1 && args[0].equalsIgnoreCase("reload")){
-				sender.sendMessage("Reloading the XmlStats plugin...");
-				LogInfo("Reloading the XmlStats plugin...");
-				this.reload();
-				return true;
+			if(sender.isOp()){
+				if (args.length == 1 && args[0].equalsIgnoreCase("reload")){
+					sender.sendMessage("Reloading the XmlStats plugin...");
+					LogInfo("Reloading the XmlStats plugin...");
+					this.reload();
+					return true;
+				}
+			}
+			else {
+				sender.sendMessage("You don't have the permission to do this!");
 			}
 		}
 		
@@ -227,7 +218,7 @@ public class XmlStats extends JavaPlugin {
 	/**
 	 * Reload.
 	 */
-	private void reload() {
+	protected void reload() {
 		this.onDisable();
 		this.onEnable();
 		
