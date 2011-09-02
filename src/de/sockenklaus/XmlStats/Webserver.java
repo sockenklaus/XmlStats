@@ -81,6 +81,9 @@ public class Webserver {
 			server.createContext("/userstats.xml", new XmlWorkerUserstats());
 			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /userstats.xml");
 		}
+		else {
+			XmlStats.LogWarn("Stats not loaded correctly. Disabling /userstats.xml");
+		}
 		
 		if (XmlStats.isiConomyHooked()){
 			server.createContext("/money.xml", new XmlWorkerMoney());
@@ -88,6 +91,13 @@ public class Webserver {
 		}
 		else {
 			XmlStats.LogWarn("iConomy not loaded correctly. Disabling /money.xml");
+		}
+		
+		if(XmlStats.isAchievementsHooked()){
+			server.createContext("/achievements.xml", new XmlWorkerAchievements());
+		}
+		else {
+			XmlStats.LogWarn("Achievements not loaded correctly. Disabling /achievements.xml");
 		}
 		
 		this.server.start();

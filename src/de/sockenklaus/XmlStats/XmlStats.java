@@ -23,6 +23,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.iConomy.iConomy;
+import com.nidefawl.Achievements.Achievements;
 import com.nidefawl.Stats.Stats;
 
 // TODO: Auto-generated Javadoc
@@ -142,7 +143,8 @@ public class XmlStats extends JavaPlugin {
 	protected void hookPlugins(){
 		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
 		Plugin iConomyTemp = getServer().getPluginManager().getPlugin("iConomy");
-
+		Plugin AchievementsTemp = getServer().getPluginManager().getPlugin("Achievements");
+		
         if(StatsTemp != null){
         	if(StatsTemp.isEnabled() && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats")){
         		XmlStatsRegistry.put("stats", (Stats)StatsTemp);
@@ -150,8 +152,19 @@ public class XmlStats extends JavaPlugin {
         	}
         }
         else {
-        	LogError("Stats not found! Can't hook into it.");
+        	LogWarn("Stats not found! Can't hook into it.");
         }
+        
+        if(AchievementsTemp != null){
+        	if(AchievementsTemp.isEnabled() && AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements")){
+        		XmlStatsRegistry.put("achievements", (Achievements)AchievementsTemp);
+        		LogInfo("Hooked into Achievements!");
+        	}
+        }
+        else {
+        	LogWarn("Achievements not found! Can't hook into it.");
+        }
+        
         if (iConomyTemp != null) {
             if (iConomyTemp.isEnabled() && iConomyTemp.getClass().getName().equals("com.iConomy.iConomy")) {
                 XmlStatsRegistry.put("iconomy", (iConomy)iConomyTemp);
@@ -159,7 +172,7 @@ public class XmlStats extends JavaPlugin {
             }
         }
         else {
-        	LogError("iConomy not found! Can't hook into it.");
+        	LogWarn("iConomy not found! Can't hook into it.");
         }
 	}	
 	
@@ -187,6 +200,20 @@ public class XmlStats extends JavaPlugin {
 		
 		if (iConomyTemp != null){
 			if (iConomyTemp.getClass().getName().equals("com.iConomy.iConomy") && iConomyTemp.isEnabled()) return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if is Achievements hooked.
+	 *
+	 * @return true, if is Achievements hooked
+	 */
+	public static boolean isAchievementsHooked(){
+		Achievements AchievementsTemp = (Achievements)XmlStatsRegistry.get("achievments");
+		
+		if (AchievementsTemp != null){
+			if(AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements") && AchievementsTemp.isEnabled()) return true;
 		}
 		return false;
 	}
