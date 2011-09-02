@@ -12,7 +12,7 @@ To install the plugin, simply place the compiled **XmlStats.jar** in your server
 
 ### Game side
 
-At this time of the development you are only able to reload the plugin without reloading the whole server:
+At this time of the development an Op is able to reload the plugin without reloading the whole server:
 
 	/xmlstats reload
 
