@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -76,14 +78,15 @@ public class XmlStats extends JavaPlugin {
 		LogDebug("options.webserver-port: "+settingsTemp.getInt("options.webserver-port"));
 		LogDebug("options.verbose-enabled: "+settingsTemp.getBoolean("options.verbose-enabled"));
 		
-		this.hookPlugins();
-		
 		if (settingsTemp.getBoolean("options.webserver-enabled")){
 			try {
 				XmlStatsRegistry.put("webserver", new Webserver());
 					
 				this.enabled = true;
 				LogInfo("XmStats "+this.version+" enabled");
+				this.hookPlugins();
+				
+				this.registerEvents();
 			}
 			catch (Exception ex){
 				LogError("Fehler beim Erstellen des Webservers:");
@@ -141,40 +144,53 @@ public class XmlStats extends JavaPlugin {
 	 * Hook plugins.
 	 */
 	protected void hookPlugins(){
-		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
-		Plugin iConomyTemp = getServer().getPluginManager().getPlugin("iConomy");
-		Plugin AchievementsTemp = getServer().getPluginManager().getPlugin("Achievements");
+		this.hookAchievements();
+		this.hookiConomy();
+		this.hookStats();
 		
-        if(StatsTemp != null){
-        	if(StatsTemp.isEnabled() && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats")){
-        		XmlStatsRegistry.put("stats", (Stats)StatsTemp);
-        		LogInfo("Hooked into Stats!");
-        	}
-        }
-        else {
-        	LogWarn("Stats not found! Can't hook into it.");
-        }
-        
-        if(AchievementsTemp != null){
-        	if(AchievementsTemp.isEnabled() && AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements")){
-        		XmlStatsRegistry.put("achievements", (Achievements)AchievementsTemp);
-        		LogInfo("Hooked into Achievements!");
-        	}
-        }
-        else {
-        	LogWarn("Achievements not found! Can't hook into it.");
-        }
-        
-        if (iConomyTemp != null) {
-            if (iConomyTemp.isEnabled() && iConomyTemp.getClass().getName().equals("com.iConomy.iConomy")) {
-                XmlStatsRegistry.put("iconomy", (iConomy)iConomyTemp);
-                LogInfo("Hooked into iConomy");
-            }
+	}
+	
+	protected void hookiConomy(){
+		Plugin iConomyTemp = getServer().getPluginManager().getPlugin("iConomy");
+		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
+		
+        if (iConomyTemp != null && iConomyTemp.isEnabled() && iConomyTemp.getClass().getName().equals("com.iConomy.iConomy")) {
+        	XmlStatsRegistry.put("iconomy", (iConomy)iConomyTemp);
+            LogInfo("Hooked into iConomy");
+            webserver.startiConomy();
         }
         else {
         	LogWarn("iConomy not found! Can't hook into it.");
         }
-	}	
+	}
+	
+	protected void hookAchievements(){
+		Plugin AchievementsTemp = getServer().getPluginManager().getPlugin("Achievements");
+		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
+		
+        if(AchievementsTemp != null && AchievementsTemp.isEnabled() && AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements")){
+        	XmlStatsRegistry.put("achievements", (Achievements)AchievementsTemp);
+        	LogInfo("Hooked into Achievements!");
+        	webserver.startAchievements();
+        }
+        else {
+        	LogWarn("Achievements not found! Can't hook into it.");
+        }
+	}
+	
+	protected void hookStats(){
+		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
+		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
+		
+		if(StatsTemp != null && StatsTemp.isEnabled() && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats")){
+        	XmlStatsRegistry.put("stats", (Stats)StatsTemp);
+        	LogInfo("Hooked into Stats!");
+        	webserver.startStats();
+        }
+        else {
+        	LogWarn("Stats not found! Can't hook into it.");
+        }
+	}
 	
 	/**
 	 * Checks if is stats hooked.
@@ -184,9 +200,7 @@ public class XmlStats extends JavaPlugin {
 	public static boolean checkStats(){
 		Stats StatsTemp = (Stats)XmlStatsRegistry.get("stats");
 		
-		if (StatsTemp != null){
-			if(StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats") && StatsTemp.isEnabled()) return true;
-		}
+		if(StatsTemp != null && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats") && StatsTemp.isEnabled()) return true;
 		return false;
 	}
 	
@@ -198,9 +212,7 @@ public class XmlStats extends JavaPlugin {
 	public static boolean checkiConomy(){
 		iConomy iConomyTemp = (iConomy)XmlStatsRegistry.get("iconomy");
 		
-		if (iConomyTemp != null){
-			if (iConomyTemp.getClass().getName().equals("com.iConomy.iConomy") && iConomyTemp.isEnabled()) return true;
-		}
+		if (iConomyTemp != null && iConomyTemp.getClass().getName().equals("com.iConomy.iConomy") && iConomyTemp.isEnabled()) return true;
 		return false;
 	}
 	
@@ -212,9 +224,7 @@ public class XmlStats extends JavaPlugin {
 	public static boolean checkAchievements(){
 		Achievements AchievementsTemp = (Achievements)XmlStatsRegistry.get("achievements");
 		
-		if (AchievementsTemp != null){
-			if(AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements") && AchievementsTemp.isEnabled()) return true;
-		}
+		if(AchievementsTemp != null && AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements") && AchievementsTemp.isEnabled()) return true;
 		return false;
 	}
 		
@@ -247,5 +257,11 @@ public class XmlStats extends JavaPlugin {
 		this.onDisable();
 		this.onEnable();
 		
+	}
+	private void registerEvents(){
+		XmlStatsServerListener listener = new XmlStatsServerListener(this);
+
+		getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, listener, Priority.Monitor, this);
+		//getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, listener, Priority.Monitor, this);
 	}
 }

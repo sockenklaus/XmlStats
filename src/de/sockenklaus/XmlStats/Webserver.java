@@ -77,29 +77,38 @@ public class Webserver {
 		
 		this.server.createContext("/users.xml", new XmlWorkerUsers());
 		
-		if(XmlStats.checkStats()){
-			server.createContext("/userstats.xml", new XmlWorkerUserstats());
-			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /userstats.xml");
-		}
-		else {
-			XmlStats.LogWarn("Stats not loaded correctly. Disabling /userstats.xml");
-		}
 		
-		if (XmlStats.checkiConomy()){
+		
+		this.server.start();
+	}
+	
+	protected void startiConomy(){
+		if (this.isRunning() && XmlStats.checkiConomy()){
 			server.createContext("/money.xml", new XmlWorkerMoney());
 			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /money.xml.");
 		}
 		else {
-			XmlStats.LogWarn("iConomy not loaded correctly. Disabling /money.xml");
+			XmlStats.LogWarn("iConomy or webserver not loaded correctly. Disabling /money.xml");
 		}
-		
-		if(XmlStats.checkAchievements()){
+	}
+	
+	protected void startAchievements(){
+		if(this.isRunning() && XmlStats.checkAchievements()){
 			server.createContext("/achievements.xml", new XmlWorkerAchievements());
+			XmlStats.LogInfo("Achievements seems to be loaded correctly. Enabling /achievements.xml");
 		}
 		else {
-			XmlStats.LogWarn("Achievements not loaded correctly. Disabling /achievements.xml");
+			XmlStats.LogWarn("Achievements or webserver not loaded correctly. Disabling /achievements.xml");
 		}
-		
-		this.server.start();
+	}
+	
+	protected void startStats(){
+		if(this.isRunning() && XmlStats.checkStats()){
+			server.createContext("/userstats.xml", new XmlWorkerUserstats());
+			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /userstats.xml");
+		}
+		else {
+			XmlStats.LogWarn("Stats or webserver not loaded correctly. Disabling /userstats.xml");
+		}
 	}
 }
