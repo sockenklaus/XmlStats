@@ -143,7 +143,6 @@ public class XmlStats extends JavaPlugin {
 	protected void hookPlugins(){
 		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
 		Plugin iConomyTemp = getServer().getPluginManager().getPlugin("iConomy");
-		Plugin AchievementsTemp = getServer().getPluginManager().getPlugin("Achievements");
 		
         if(StatsTemp != null){
         	if(StatsTemp.isEnabled() && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats")){
@@ -154,17 +153,7 @@ public class XmlStats extends JavaPlugin {
         else {
         	LogWarn("Stats not found! Can't hook into it.");
         }
-        
-        if(AchievementsTemp != null){
-        	if(AchievementsTemp.isEnabled() && AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements")){
-        		XmlStatsRegistry.put("achievements", (Achievements)AchievementsTemp);
-        		LogInfo("Hooked into Achievements!");
-        	}
-        }
-        else {
-        	LogWarn("Achievements not found! Can't hook into it.");
-        }
-        
+            
         if (iConomyTemp != null) {
             if (iConomyTemp.isEnabled() && iConomyTemp.getClass().getName().equals("com.iConomy.iConomy")) {
                 XmlStatsRegistry.put("iconomy", (iConomy)iConomyTemp);
@@ -204,20 +193,6 @@ public class XmlStats extends JavaPlugin {
 		return false;
 	}
 	
-	/**
-	 * Checks if is Achievements hooked.
-	 *
-	 * @return true, if is Achievements hooked
-	 */
-	public static boolean isAchievementsHooked(){
-		Achievements AchievementsTemp = (Achievements)XmlStatsRegistry.get("achievments");
-		
-		if (AchievementsTemp != null){
-			if(AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements") && AchievementsTemp.isEnabled()) return true;
-		}
-		return false;
-	}
-		
 	/* (non-Javadoc)
 	 * @see org.bukkit.plugin.java.JavaPlugin#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */

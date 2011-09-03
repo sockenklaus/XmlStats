@@ -92,14 +92,7 @@ public class Webserver {
 		else {
 			XmlStats.LogWarn("iConomy not loaded correctly. Disabling /money.xml");
 		}
-		
-		if(XmlStats.isAchievementsHooked()){
-			server.createContext("/achievements.xml", new XmlWorkerAchievements());
-		}
-		else {
-			XmlStats.LogWarn("Achievements not loaded correctly. Disabling /achievements.xml");
-		}
-		
+				
 		this.server.start();
 	}
 }
