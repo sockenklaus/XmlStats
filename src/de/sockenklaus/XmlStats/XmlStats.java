@@ -181,7 +181,7 @@ public class XmlStats extends JavaPlugin {
 	 *
 	 * @return true, if is stats hooked
 	 */
-	public static boolean isStatsHooked(){
+	public static boolean checkStats(){
 		Stats StatsTemp = (Stats)XmlStatsRegistry.get("stats");
 		
 		if (StatsTemp != null){
@@ -195,7 +195,7 @@ public class XmlStats extends JavaPlugin {
 	 *
 	 * @return true, if is i conomy hooked
 	 */
-	public static boolean isiConomyHooked(){
+	public static boolean checkiConomy(){
 		iConomy iConomyTemp = (iConomy)XmlStatsRegistry.get("iconomy");
 		
 		if (iConomyTemp != null){
@@ -209,8 +209,8 @@ public class XmlStats extends JavaPlugin {
 	 *
 	 * @return true, if is Achievements hooked
 	 */
-	public static boolean isAchievementsHooked(){
-		Achievements AchievementsTemp = (Achievements)XmlStatsRegistry.get("achievments");
+	public static boolean checkAchievements(){
+		Achievements AchievementsTemp = (Achievements)XmlStatsRegistry.get("achievements");
 		
 		if (AchievementsTemp != null){
 			if(AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements") && AchievementsTemp.isEnabled()) return true;

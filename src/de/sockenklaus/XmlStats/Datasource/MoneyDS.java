@@ -51,7 +51,7 @@ public class MoneyDS extends Datasource {
 	private Double getBalance(String playerName){
 		Double result = 0.0;
 		
-		if (XmlStats.isiConomyHooked()){
+		if (XmlStats.checkiConomy()){
 			if(this.iConomy.hasAccount(playerName)){
 				Account account = this.iConomy.getAccount(playerName);
 				

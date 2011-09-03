@@ -77,7 +77,7 @@ public class Webserver {
 		
 		this.server.createContext("/users.xml", new XmlWorkerUsers());
 		
-		if(XmlStats.isStatsHooked()){
+		if(XmlStats.checkStats()){
 			server.createContext("/userstats.xml", new XmlWorkerUserstats());
 			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /userstats.xml");
 		}
@@ -85,7 +85,7 @@ public class Webserver {
 			XmlStats.LogWarn("Stats not loaded correctly. Disabling /userstats.xml");
 		}
 		
-		if (XmlStats.isiConomyHooked()){
+		if (XmlStats.checkiConomy()){
 			server.createContext("/money.xml", new XmlWorkerMoney());
 			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /money.xml.");
 		}
@@ -93,7 +93,7 @@ public class Webserver {
 			XmlStats.LogWarn("iConomy not loaded correctly. Disabling /money.xml");
 		}
 		
-		if(XmlStats.isAchievementsHooked()){
+		if(XmlStats.checkAchievements()){
 			server.createContext("/achievements.xml", new XmlWorkerAchievements());
 		}
 		else {
