@@ -16,6 +16,7 @@ package de.sockenklaus.XmlStats.XmlWorkers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
@@ -24,6 +25,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
@@ -37,7 +47,15 @@ import de.sockenklaus.XmlStats.XmlStats;
  * The Class XmlWorker.
  */
 public abstract class XmlWorker implements HttpHandler {
-	
+	protected DocumentBuilderFactory factory;
+	protected DocumentBuilder builder;
+	protected Document doc;
+	protected DOMSource source;
+	protected StringWriter writer;
+	protected StreamResult result;
+	protected TransformerFactory tf;
+	protected Transformer transformer;
+		
 	/* (non-Javadoc)
 	 * @see com.sun.net.httpserver.HttpHandler#handle(com.sun.net.httpserver.HttpExchange)
 	 */
@@ -155,12 +173,12 @@ public abstract class XmlWorker implements HttpHandler {
 		
 		try {
 			XmlStats.LogDebug("OK... let's try gzip compression...");
-			XmlStats.LogDebug("Actual size of the xml file: "+input.length+"Bytes");
+			XmlStats.LogDebug("Actual size of the xml file: "+input.length+" B");
 			GZIPOutputStream gzip = new GZIPOutputStream(out);
 			gzip.write(input);
 			gzip.close();
 			output = out.toByteArray();
-			XmlStats.LogDebug("Compressed size of the xml file: "+output.length+"Bytes");
+			XmlStats.LogDebug("Compressed size of the xml file: "+output.length+" B");
 		}
 		catch(IOException e){
 			XmlStats.LogError("GZIP-Compression failed! Returning empty byte[]");

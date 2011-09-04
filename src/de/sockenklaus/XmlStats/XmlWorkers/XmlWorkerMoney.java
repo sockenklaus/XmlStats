@@ -20,14 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.nidefawl.Stats.Stats;
@@ -51,46 +48,48 @@ public class XmlWorkerMoney extends XmlWorker {
 	 */
 	@Override
 	public String getXML(Map<String, List<String>> parameters) {
+		
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.newDocument();
-			DOMSource source = new DOMSource(doc);
-			StringWriter writer = new StringWriter();
-			StreamResult result = new StreamResult(writer);
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
-			
+			this.factory = DocumentBuilderFactory.newInstance();
+			this.builder = this.factory.newDocumentBuilder();
+			this.doc = this.builder.newDocument();	
+			this.source = new DOMSource(this.doc);
+			this.writer = new StringWriter();
+			this.result = new StreamResult(this.writer);
+			this.tf = TransformerFactory.newInstance();
+			this.transformer = this.tf.newTransformer();
+
 			HashMap<String, Double> balances = moneyDS.getBalances();
-			
-			Element root = doc.createElement("money");
-			doc.appendChild(root);
-			
+
+			Element root = this.doc.createElement("xmlstats");
+			Element elem_money = this.doc.createElement("money");
+			this.doc.appendChild(root);
+			root.appendChild(elem_money);
+
+
 			/*
 			 * Hier wird das XML aufgebaut
 			 */
-			
+
 			for (String playerName : balances.keySet()){
-				Element elem_player = doc.createElement("player");
+				Element elem_player = this.doc.createElement("player");
 				elem_player.setAttribute("name", playerName);
 				elem_player.setAttribute("balance", String.valueOf(balances.get(playerName)));
-				
-				root.appendChild(elem_player);
+
+				elem_money.appendChild(elem_player);
 			}
-			
+
 			/*
 			 * Hier endet der XML-Aufbau
 			 */
-			
-			transformer.transform(source, result);
-			return writer.toString();
+			transformer.transform(this.source, result);
+			return this.writer.toString();
 		} 
 		
 		catch (Exception e){
 			Stats.log.log(Level.SEVERE, "Something went terribly wrong!");
 			Stats.log.log(Level.SEVERE, e.getMessage());
+			return "";
 		}
-		
-		return "";
 	}
 }

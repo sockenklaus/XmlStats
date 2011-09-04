@@ -14,26 +14,20 @@
 */
 package de.sockenklaus.XmlStats.XmlWorkers;
 
-import java.io.File;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.nidefawl.Stats.Stats;
-import com.nidefawl.Stats.ItemResolver.hModItemResolver;
 import com.nidefawl.Stats.datasource.Category;
 import com.nidefawl.Stats.datasource.PlayerStat;
 
@@ -47,16 +41,12 @@ public class XmlWorkerUserstats extends XmlWorker {
 	
 	/** The stats ds. */
 	private UserstatsDS statsDS;
-	private hModItemResolver itemResolver;
-	private String[] resolveCats;
 	
 	/**
 	 * Instantiates a new xml worker userstats.
 	 */
 	public XmlWorkerUserstats(){
 		this.statsDS = new UserstatsDS();
-		itemResolver = new hModItemResolver(new File(statsDS.getDataFolder(),"items.txt"));
-		resolveCats = new String[]{"blockdestroy", "blockcreate", "itemdrop", "itempickup"};
 	}
 	
 	/* (non-Javadoc)
@@ -64,36 +54,38 @@ public class XmlWorkerUserstats extends XmlWorker {
 	 */
 	public String getXML(Map<String, List<String>> parameters) {
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.newDocument();
-			DOMSource source = new DOMSource(doc);
-			StringWriter writer = new StringWriter();
-			StreamResult result = new StreamResult(writer);
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
-			
-			Element root = doc.createElement("stats");
-			doc.appendChild(root);
-			
+			this.factory = DocumentBuilderFactory.newInstance();
+			this.builder = this.factory.newDocumentBuilder();
+			this.doc = this.builder.newDocument();	
+			this.source = new DOMSource(this.doc);
+			this.writer = new StringWriter();
+			this.result = new StreamResult(writer);
+			this.tf = TransformerFactory.newInstance();
+			this.transformer = this.tf.newTransformer();
+
+			Element root = this.doc.createElement("xmlstats");
+			Element elem_userstats = this.doc.createElement("userstats");
+			this.doc.appendChild(root);
+			root.appendChild(elem_userstats);
+
 			/*
 			 * Hier wird das XML aufgebaut
 			 */
 			if (!parameters.containsKey("player")){
 				// Generate a summarized XML
-				
-				root.appendChild(getAddedUpStatsElement(doc));
-				
+				elem_userstats.setAttribute("type", "sum");
+				elem_userstats.appendChild(getAddedUpStatsElement());
+
 			}
 			else {
 				// Generate the XML for the given user(s)
 				for(String playerName : statsDS.fetchAllPlayers()){
 					if (parameters.containsKey("player") && parameters.get("player").contains(playerName.toLowerCase())){
-						root.appendChild(getPlayerElement(playerName, doc));
+						elem_userstats.appendChild(getPlayerElement(playerName));
 					}
 				}
 			}
-			
+
 			/*
 			 * Hier endet der XML-Aufbau
 			 */
@@ -101,77 +93,87 @@ public class XmlWorkerUserstats extends XmlWorker {
 			transformer.transform(source, result);
 			return writer.toString();
 		} 
-		
 		catch (Exception e){
 			Stats.log.log(Level.SEVERE, "Something went terribly wrong!");
 			Stats.log.log(Level.SEVERE, e.getMessage());
+			return "";
 		}
-		
-		return "";
 	}
 	
 	/**
 	 * Build a XML subtree for the given player.
 	 *
 	 * @param playerName the player name
-	 * @param doc the doc
+	 * @paramthis.doc thethis.doc
 	 * @return 				Returns a XML subtree for the given playerName.
 	 */
-	private Element getPlayerElement(String playerName, Document doc){
+	private Element getPlayerElement(String playerName){
 		PlayerStat player_stats = statsDS.getPlayerStat(playerName);
 		
-		Element elem_player = doc.createElement("player");
-		elem_player.setAttribute("name", playerName);
+		Element elem_player = this.doc.createElement("player");
+		Element elem_cats = this.doc.createElement("categories");
+	
+		elem_player.appendChild(getTextElem("name", playerName));
+		elem_player.appendChild(elem_cats);
 		
 		for(String catName : player_stats.getCats()){
 			Category cat = player_stats.get(catName);
-			Element elem_cat = doc.createElement("category");
-			elem_cat.setAttribute("name", catName);
-				
+			Element elem_cat = this.doc.createElement("category");
+			Element elem_items = this.doc.createElement("items");
+			
+			elem_cat.appendChild(getTextElem("name", catName));
+			elem_cat.appendChild(elem_items);
+			elem_cats.appendChild(elem_cat);
+			
 			for(String valName : cat.stats.keySet()){
 				int value = cat.get(valName);
-				Element elem_value = doc.createElement("stat");
-				
-				elem_value.setAttribute("name", valName);
-				
-				if (Arrays.asList(resolveCats).contains(catName)){
-					elem_value.setAttribute("id", String.valueOf(itemResolver.getItem(valName)));
-				}
-				elem_value.setAttribute("value", String.valueOf(value));
-				
-				elem_cat.appendChild(elem_value);
+				Element elem_item = this.doc.createElement("item");
+								
+				elem_item.appendChild(getTextElem("name", valName));
+				elem_item.appendChild(getTextElem("value", String.valueOf(value)));
+								
+				elem_items.appendChild(elem_item);
 			}
-			
-			
-			elem_player.appendChild(elem_cat);
 		}
 		return elem_player;
 	}
 	
-	private Element getAddedUpStatsElement(Document doc){
+	private Element getAddedUpStatsElement(){
 		HashMap<String, HashMap<String, Integer>> addedStats = statsDS.getAddedStats();
+		Element elem_player = this.doc.createElement("player");
+		Element elem_cats = this.doc.createElement("categories");
 		
-		Element elem_player = doc.createElement("player");
-		elem_player.setAttribute("name", "*");
+		elem_player.appendChild(elem_cats);
 		
 		for (String catName : addedStats.keySet()){
-			Element elem_cat = doc.createElement("category");
-			elem_cat.setAttribute("name", catName);
+			Element elem_cat = this.doc.createElement("category");
+			Element elem_items = this.doc.createElement("items");
+			
+			elem_cat.appendChild(getTextElem("name", catName));
+			elem_cat.appendChild(elem_items);
+			elem_cats.appendChild(elem_cat);
 				
 			for(String entryName : addedStats.get(catName).keySet()){
-				Element elem_stat = doc.createElement("stat");
-				elem_stat.setAttribute("name", entryName);
-					
-				if(Arrays.asList(resolveCats).contains(catName)){
-					elem_stat.setAttribute("id", String.valueOf(itemResolver.getItem(entryName)));
-				}
-				elem_stat.setAttribute("value", String.valueOf(addedStats.get(catName).get(entryName)));
+				Element elem_item = this.doc.createElement("item");
 				
-				elem_cat.appendChild(elem_stat);
+				elem_item.appendChild(getTextElem("name", entryName));
+				elem_item.appendChild(getTextElem("value", String.valueOf(addedStats.get(catName).get(entryName))));
+				
+				elem_items.appendChild(elem_item);
 			}
-			elem_player.appendChild(elem_cat);
+			elem_cat.appendChild(elem_items);
 		}
 		
 		return elem_player;
+	}
+	
+	private Element getTextElem(String elemName, String text){
+		Element result = this.doc.createElement(elemName);
+		result.setTextContent(text);
+		return result;
+	}
+	
+	private Element getItemElem(String key, String value){
+		return null;
 	}
 }

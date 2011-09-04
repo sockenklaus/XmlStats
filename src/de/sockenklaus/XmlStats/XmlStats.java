@@ -77,7 +77,7 @@ public class XmlStats extends JavaPlugin {
 		LogDebug("options.webserver-enabled: "+settingsTemp.getBoolean("options.webserver-enabled"));
 		LogDebug("options.webserver-port: "+settingsTemp.getInt("options.webserver-port"));
 		LogDebug("options.verbose-enabled: "+settingsTemp.getBoolean("options.verbose-enabled"));
-		
+			
 		if (settingsTemp.getBoolean("options.webserver-enabled")){
 			try {
 				XmlStatsRegistry.put("webserver", new Webserver());
@@ -85,7 +85,6 @@ public class XmlStats extends JavaPlugin {
 				this.enabled = true;
 				LogInfo("XmStats "+this.version+" enabled");
 				this.hookPlugins();
-				
 				this.registerEvents();
 			}
 			catch (Exception ex){
