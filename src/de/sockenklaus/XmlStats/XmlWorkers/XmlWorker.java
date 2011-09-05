@@ -28,12 +28,16 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
@@ -69,47 +73,89 @@ public abstract class XmlWorker implements HttpHandler {
 			String xmlResponse = "";
 			byte[] byteResponse = null;
 			
+			/*
+			 * Parse the parameters
+			 */
 			try {
 				parameters = parseParameters(queryString);
-			} catch(UnsupportedEncodingException ex){
-				XmlStats.LogWarn("Fehler beim Parsen des HTTP-Query-Strings.");
-				XmlStats.LogWarn(ex.getMessage());
-			}
-			
-			xmlResponse = getXML(parameters);
-			
-			
-			/*
-			 * Check if the clients sends the header "Accept-encoding", the option "gzip-enabled" is true and the clients supports gzip.
-			 */
-			
-			
-			
-			if(parameters.containsKey("gzip") && parameters.get("gzip").contains("true")){
-				XmlStats.LogDebug("Raw gzip requested.");
+
+				/*
+				 * Create the XML doc stuff....
+				 */
+				this.factory = DocumentBuilderFactory.newInstance();
+				this.builder = this.factory.newDocumentBuilder();
+				this.doc = this.builder.newDocument();	
+				this.source = new DOMSource(this.doc);
+				this.writer = new StringWriter();
+				this.result = new StreamResult(this.writer);
+				this.tf = TransformerFactory.newInstance();
+				this.transformer = this.tf.newTransformer();
 				
-				HttpContext context = exchange.getHttpContext();
-				String filename = context.getPath().substring(1);
+				Element root = this.doc.createElement("xmlstats");
+				this.doc.appendChild(root);
+				/*
+				 * Actually create the XML
+				 */
+				root.appendChild(getXML(parameters));
+
+				/*
+				 * Build string from XML
+				 */
+			}
+			catch(TransformerConfigurationException e){
 				
-				byteResponse = compressData(xmlResponse.getBytes());
-				exchange.getResponseHeaders().set("Content-type", "application/gzip");
-				exchange.getResponseHeaders().set("Content-disposition", "attachment; filename="+filename+".gzip");
 			}
-			else if(clientAcceptsGzip(headers)) {
-				byteResponse = compressData(xmlResponse.getBytes());
-				exchange.getResponseHeaders().set("Content-encoding", "gzip");
-			}	
-			else {
-				byteResponse = xmlResponse.getBytes();
+			catch(ParserConfigurationException e){
+				
 			}
-									
+			catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
 			try {
+				this.transformer.transform(this.source, this.result);
+
+				xmlResponse = this.writer.toString(); 
+
+
+				/*
+				 * Check if the clients sends the header "Accept-encoding", the option "gzip-enabled" is true and the clients supports gzip.
+				 */
+
+				if(parameters.containsKey("gzip") && parameters.get("gzip").contains("true")){
+					XmlStats.LogDebug("Raw gzip requested.");
+
+					HttpContext context = exchange.getHttpContext();
+					String filename = context.getPath().substring(1);
+
+					byteResponse = compressData(xmlResponse.getBytes());
+					exchange.getResponseHeaders().set("Content-type", "application/gzip");
+					exchange.getResponseHeaders().set("Content-disposition", "attachment; filename="+filename+".gzip");
+				}
+				else if(clientAcceptsGzip(headers)) {
+					byteResponse = compressData(xmlResponse.getBytes());
+					exchange.getResponseHeaders().set("Content-encoding", "gzip");
+				}	
+				else {
+					byteResponse = xmlResponse.getBytes();
+				}
+
+
 				exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, byteResponse.length);
-		        exchange.getResponseBody().write(byteResponse);
+				exchange.getResponseBody().write(byteResponse);
+			}
+			
+			catch(UnsupportedEncodingException e){
 			}
 			catch(IOException ex){
 				XmlStats.LogError("Fehler beim Senden der HTTP-Antwort.");
 				XmlStats.LogError(ex.getMessage());
+			}
+			catch (TransformerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 	        
 	        exchange.close();
@@ -165,7 +211,7 @@ public abstract class XmlWorker implements HttpHandler {
 	 * @param parameters the parameters
 	 * @return the xML
 	 */
-	abstract String getXML(Map<String, List<String>> parameters);
+	abstract Element getXML(Map<String, List<String>> parameters);
 	
 	private byte[] compressData(byte[] input){
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -201,5 +247,18 @@ public abstract class XmlWorker implements HttpHandler {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Gets the text elem.
+	 *
+	 * @param elemName the elem name
+	 * @param text the text
+	 * @return the text elem
+	 */
+	protected Element getTextElem(String elemName, String text){
+		Element result = this.doc.createElement(elemName);
+		result.setTextContent(text);
+		return result;
 	}
 }

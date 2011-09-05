@@ -14,20 +14,11 @@
 */
 package de.sockenklaus.XmlStats.XmlWorkers;
 
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Element;
-
-import com.nidefawl.Stats.Stats;
 
 import de.sockenklaus.XmlStats.Datasource.MoneyDS;
 
@@ -47,49 +38,27 @@ public class XmlWorkerMoney extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
 	@Override
-	public String getXML(Map<String, List<String>> parameters) {
+	public Element getXML(Map<String, List<String>> parameters) {
 		
-		try {
-			this.factory = DocumentBuilderFactory.newInstance();
-			this.builder = this.factory.newDocumentBuilder();
-			this.doc = this.builder.newDocument();	
-			this.source = new DOMSource(this.doc);
-			this.writer = new StringWriter();
-			this.result = new StreamResult(this.writer);
-			this.tf = TransformerFactory.newInstance();
-			this.transformer = this.tf.newTransformer();
-
-			HashMap<String, Double> balances = moneyDS.getBalances();
-
-			Element root = this.doc.createElement("xmlstats");
-			Element elem_money = this.doc.createElement("money");
-			this.doc.appendChild(root);
-			root.appendChild(elem_money);
-
-
-			/*
-			 * Hier wird das XML aufgebaut
-			 */
-
-			for (String playerName : balances.keySet()){
-				Element elem_player = this.doc.createElement("player");
-				elem_player.setAttribute("name", playerName);
-				elem_player.setAttribute("balance", String.valueOf(balances.get(playerName)));
-
-				elem_money.appendChild(elem_player);
-			}
-
-			/*
-			 * Hier endet der XML-Aufbau
-			 */
-			transformer.transform(this.source, result);
-			return this.writer.toString();
-		} 
+		HashMap<String, Double> balances = moneyDS.getBalances();
 		
-		catch (Exception e){
-			Stats.log.log(Level.SEVERE, "Something went terribly wrong!");
-			Stats.log.log(Level.SEVERE, e.getMessage());
-			return "";
+		Element elem_users = this.doc.createElement("users");
+
+		/*
+		 * Hier wird das XML aufgebaut
+		 */
+
+		for (String playerName : balances.keySet()){
+			Element elem_user = this.doc.createElement("user");
+			elem_user.appendChild(getTextElem("name", playerName));
+			elem_user.appendChild(getTextElem("balance", String.valueOf(balances.get(playerName))));
+
+			elem_users.appendChild(elem_user);
 		}
+
+		/*
+		 * Hier endet der XML-Aufbau
+		 */
+		return elem_users;
 	}
 }

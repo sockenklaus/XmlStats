@@ -3,21 +3,13 @@
  */
 package de.sockenklaus.XmlStats.XmlWorkers;
 
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Element;
 
 import com.nidefawl.Achievements.AchievementListData;
-import com.nidefawl.Stats.Stats;
 
 import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
 
@@ -37,45 +29,31 @@ public class XmlWorkerAchievements extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
 	@Override
-	String getXML(Map<String, List<String>> parameters) {
-	
-		try {
-			this.factory = DocumentBuilderFactory.newInstance();
-			this.builder = this.factory.newDocumentBuilder();
-			this.doc = this.builder.newDocument();	
-			this.source = new DOMSource(this.doc);
-			this.writer = new StringWriter();
-			this.result = new StreamResult(this.writer);
-			this.tf = TransformerFactory.newInstance();
-			this.transformer = this.tf.newTransformer();	
+	Element getXML(Map<String, List<String>> parameters) {
 
-			HashMap<String, AchievementListData> achList = achDS.getAchievementsList();
+			
+		HashMap<String, AchievementListData> achList = achDS.getAchievementsList();
 
-			Element root = this.doc.createElement("xmlstats");
-			Element elem_achs = this.doc.createElement("achievements");
-			this.doc.appendChild(root);
-			root.appendChild(elem_achs);
+		Element elem_achs = this.doc.createElement("achievements");
 
-			/*
-			 * Hier wird das XML aufgebaut
-			 */
+		/*
+		 * Hier wird das XML aufgebaut
+		 */
+		if(parameters.containsKey("user")){
+			for (String playerName : parameters.get("user")){
+				elem_achs.appendChild(getPlayerAchievement(playerName));
+			}
+		}
+		else {
 			for(String achName : achList.keySet()){
 				elem_achs.appendChild(getAchievement(achList.get(achName)));
 			}
+		}
 
-			/*
-			 * Hier endet der XML-Aufbau
-			 */
-		
-			this.transformer.transform(this.source, result);
-			return this.writer.toString();
-		}
-		catch (Exception e){
-			Stats.log.log(Level.SEVERE, "Something went terribly wrong!");
-			Stats.log.log(Level.SEVERE, e.getMessage());
-			return "";
-		}
-		
+		/*
+		 * Hier endet der XML-Aufbau
+		 */
+		return elem_achs;
 		
 	}
 	
@@ -104,6 +82,13 @@ public class XmlWorkerAchievements extends XmlWorker {
 		
 		return elem_ach;
 		
+	}
+	
+	private Element getPlayerAchievement(String playerName){
+		Element elem_player = this.doc.createElement("user");
+		elem_player.appendChild(getTextElem("name", playerName));
+		
+		return null;
 	}
 
 }

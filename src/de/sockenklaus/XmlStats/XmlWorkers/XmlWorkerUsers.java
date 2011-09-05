@@ -14,21 +14,12 @@
 */
 package de.sockenklaus.XmlStats.XmlWorkers;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.bukkit.entity.Player;
 import org.w3c.dom.Element;
-
-import com.nidefawl.Stats.Stats;
 
 import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.XmlStatsRegistry;
@@ -44,68 +35,46 @@ public class XmlWorkerUsers extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
 	@Override
-	public String getXML(Map<String, List<String>> parameters) {
+	public Element getXML(Map<String, List<String>> parameters) {
 		UsersDS users = new UsersDS();
+	
+		Element elem_users = this.doc.createElement("users");
+		elem_users.setAttribute("count", String.valueOf(users.getAllPlayers().size()));
 		
-		try {
-			this.factory = DocumentBuilderFactory.newInstance();
-			this.builder = this.factory.newDocumentBuilder();
-			this.doc = this.builder.newDocument();	
-			this.source = new DOMSource(this.doc);
-			this.writer = new StringWriter();
-			this.result = new StreamResult(writer);
-			this.tf = TransformerFactory.newInstance();
-			this.transformer = tf.newTransformer();		
-		
-			Element root = this.doc.createElement("xmlstats");
-			Element elem_users = this.doc.createElement("users");
-			elem_users.setAttribute("count", String.valueOf(users.getAllPlayers().size()));
-			this.doc.appendChild(root);
-			root.appendChild(elem_users);
+		/*
+		 * Get list online player names
+		 */
+		XmlStats pluginTemp= (XmlStats)XmlStatsRegistry.get("xmlstats");
 
-			/*
-			 * Get list online player names
-			 */
-			XmlStats pluginTemp= (XmlStats)XmlStatsRegistry.get("xmlstats");
+		Player[] onlinePlayers = pluginTemp.getServer().getOnlinePlayers();
+		List<String> onlinePlayerNames = new ArrayList<String>();
 
-			Player[] onlinePlayers = pluginTemp.getServer().getOnlinePlayers();
-			List<String> onlinePlayerNames = new ArrayList<String>();
-
-			if (onlinePlayers != null){
-				for (int i = 0; i < onlinePlayers.length; i++){
-					onlinePlayerNames.add(onlinePlayers[i].getName());
-				}
+		if (onlinePlayers != null){
+			for (int i = 0; i < onlinePlayers.length; i++){
+				onlinePlayerNames.add(onlinePlayers[i].getName());
 			}
-			/*
-			 * Got list of online player names
-			 */
+		}
+		/*
+		 * Got list of online player names
+		 */
 
-			/*
-			 * Hier wird das XML aufgebaut
-			 */
+		/*
+		 * Hier wird das XML aufgebaut
+		 */
 
-			for(String playerName : users.getAllPlayers()){
+		for(String playerName : users.getAllPlayers()){
 
-				Element elem_player = this.doc.createElement("player");
-				elem_player.setTextContent(playerName);
+			Element elem_player = this.doc.createElement("user");
+			elem_player.appendChild(getTextElem("name", playerName));
 
-				elem_player.setAttribute("status", onlinePlayerNames.contains(playerName) ? "online":"offline");
+			elem_player.setAttribute("status", onlinePlayerNames.contains(playerName) ? "online":"offline");
 
-				elem_users.appendChild(elem_player);
-			}
-			/*
-			 * Hier endet der XML-Aufbau
-			 */
-			transformer.transform(source, result);
-			return writer.toString();
-		} 
-		
-		catch (Exception e)
-		{
-			Stats.log.log(Level.SEVERE, "Something went terribly wrong!");
-			Stats.log.log(Level.SEVERE, e.getMessage());
-			return "";
-		}		
+			elem_users.appendChild(elem_player);
+		}
+		/*
+		 * Hier endet der XML-Aufbau
+		 */
+		return elem_users;
 	}
 	
 }

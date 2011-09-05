@@ -75,40 +75,38 @@ public class Webserver {
 		
 		this.server = HttpServer.create(this.address, 0);
 		
-		this.server.createContext("/users.xml", new XmlWorkerUsers());
-		
-		
+		this.server.createContext("/users_list.xml", new XmlWorkerUsers());
 		
 		this.server.start();
 	}
 	
 	protected void startiConomy(){
 		if (this.isRunning() && XmlStats.checkiConomy()){
-			server.createContext("/money.xml", new XmlWorkerMoney());
-			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /money.xml.");
+			server.createContext("/users_balances.xml", new XmlWorkerMoney());
+			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /users_balances.xml");
 		}
 		else {
-			XmlStats.LogWarn("iConomy or webserver not loaded correctly. Disabling /money.xml");
+			XmlStats.LogWarn("iConomy or webserver not loaded correctly. Disabling /users_balances.xml");
 		}
 	}
 	
 	protected void startAchievements(){
 		if(this.isRunning() && XmlStats.checkAchievements()){
-			server.createContext("/achievements.xml", new XmlWorkerAchievements());
-			XmlStats.LogInfo("Achievements seems to be loaded correctly. Enabling /achievements.xml");
+			server.createContext("/user_achievements.xml", new XmlWorkerAchievements());
+			XmlStats.LogInfo("Achievements seems to be loaded correctly. Enabling /user_achievements.xml");
 		}
 		else {
-			XmlStats.LogWarn("Achievements or webserver not loaded correctly. Disabling /achievements.xml");
+			XmlStats.LogWarn("Achievements or webserver not loaded correctly. Disabling /user_achievements.xml");
 		}
 	}
 	
 	protected void startStats(){
 		if(this.isRunning() && XmlStats.checkStats()){
-			server.createContext("/userstats.xml", new XmlWorkerUserstats());
-			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /userstats.xml");
+			server.createContext("/user_stats.xml", new XmlWorkerUserstats());
+			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /user_stats.xml");
 		}
 		else {
-			XmlStats.LogWarn("Stats or webserver not loaded correctly. Disabling /userstats.xml");
+			XmlStats.LogWarn("Stats or webserver not loaded correctly. Disabling /user_stats.xml");
 		}
 	}
 }
