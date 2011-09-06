@@ -75,15 +75,15 @@ public class Webserver {
 		
 		this.server = HttpServer.create(this.address, 0);
 		
-		this.server.createContext("/users_list.xml", new XmlWorkerUsers());
+		this.server.createContext("/user_list.xml", new XmlWorkerUsers());
 		
 		this.server.start();
 	}
 	
 	protected void startiConomy(){
 		if (this.isRunning() && XmlStats.checkiConomy()){
-			server.createContext("/users_balances.xml", new XmlWorkerMoney());
-			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /users_balances.xml");
+			server.createContext("/user_balances.xml", new XmlWorkerMoney());
+			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /user_balances.xml");
 		}
 		else {
 			XmlStats.LogWarn("iConomy or webserver not loaded correctly. Disabling /users_balances.xml");

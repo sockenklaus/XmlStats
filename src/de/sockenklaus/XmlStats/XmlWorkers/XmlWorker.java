@@ -179,27 +179,26 @@ public abstract class XmlWorker implements HttpHandler {
 				String param[] = pair.split("[=]");
 				
 				String key = null;
-				String value = null;
+				String[] valueArr = null;
 				
 				if(param.length > 0){
 					key = URLDecoder.decode(param[0].toLowerCase(), System.getProperty("file.encoding"));
+					valueArr = new String[1];
+					valueArr[0] = "";
 				}
 				
 				if(param.length > 1){
-					value = URLDecoder.decode(param[1].toLowerCase(), System.getProperty("file.encoding"));
+					valueArr = URLDecoder.decode(param[1].toLowerCase(), System.getProperty("file.encoding")).split(",");
 				}
 				
-				if (result.containsKey(key)){
-					List<String> values = result.get(key);
-					
-					values.add(value);
+				List<String> values = new ArrayList<String>();
+				for (String value : valueArr){
+					if (!values.contains(value)){
+						values.add(value);
+					}
 				}
-				else {
-					List<String> values = new ArrayList<String>();
-					values.add(value);
 					
-					result.put(key, values);
-				}
+				result.put(key, values);
 			}
 		}
 		return result;
