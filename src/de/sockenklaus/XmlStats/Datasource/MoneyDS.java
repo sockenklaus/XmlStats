@@ -16,6 +16,7 @@ package de.sockenklaus.XmlStats.Datasource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.iConomy.iConomy;
 import com.iConomy.system.Account;
@@ -48,10 +49,10 @@ public class MoneyDS extends Datasource {
 	}
 	
 	@SuppressWarnings("static-access")
-	private Double getBalance(String playerName){
+	public Double getBalance(String playerName){
 		Double result = 0.0;
 		
-		if (XmlStats.isiConomyHooked()){
+		if (XmlStats.checkiConomy()){
 			if(this.iConomy.hasAccount(playerName)){
 				Account account = this.iConomy.getAccount(playerName);
 				
@@ -65,6 +66,20 @@ public class MoneyDS extends Datasource {
 		}
 		else {
 			XmlStats.LogError("Something went wrong! /money.xml shouldn't be enabled but it's datasource was called! This will return bad results.");
+		}
+		
+		return result;
+	}
+
+	/**
+	 * @param list
+	 * @return
+	 */
+	public int getSum(List<String> list) {
+		int result = 0;
+		
+		for(String playerName : list){
+			result+=this.getBalance(playerName);
 		}
 		
 		return result;

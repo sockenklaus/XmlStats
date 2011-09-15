@@ -75,24 +75,41 @@ public class Webserver {
 		
 		this.server = HttpServer.create(this.address, 0);
 		
-		this.server.createContext("/users.xml", new XmlWorkerUsers());
+		this.server.createContext("/user_list.xml", new UserList());
 		
-		if(XmlStats.isStatsHooked()){
-			server.createContext("/userstats.xml", new XmlWorkerUserstats());
-			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /userstats.xml");
-		}
-		else {
-			XmlStats.LogWarn("Stats not loaded correctly. Disabling /userstats.xml");
-		}
-		
-		if (XmlStats.isiConomyHooked()){
-			server.createContext("/money.xml", new XmlWorkerMoney());
-			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /money.xml.");
-		}
-		else {
-			XmlStats.LogWarn("iConomy not loaded correctly. Disabling /money.xml");
-		}
-				
 		this.server.start();
+
+		this.server.start();
+	}
+	
+	protected void startiConomy(){
+		if (this.isRunning() && XmlStats.checkiConomy()){
+			server.createContext("/user_balances.xml", new UserBalances());
+			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /user_balances.xml");
+		}
+		else {
+			XmlStats.LogWarn("iConomy or webserver not loaded correctly. Disabling /users_balances.xml");
+		}
+	}
+	
+	protected void startAchievements(){
+		if(this.isRunning() && XmlStats.checkAchievements()){
+			server.createContext("/user_achievements.xml", new UserAchievements());
+			server.createContext("/achievements_list.xml", new AchievementsList());
+			XmlStats.LogInfo("Achievements seems to be loaded correctly. Enabling /user_achievements.xml");
+		}
+		else {
+			XmlStats.LogWarn("Achievements or webserver not loaded correctly. Disabling /user_achievements.xml");
+		}
+	}
+	
+	protected void startStats(){
+		if(this.isRunning() && XmlStats.checkStats()){
+			server.createContext("/user_stats.xml", new UserStats());
+			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /user_stats.xml");
+		}
+		else {
+			XmlStats.LogWarn("Stats or webserver not loaded correctly. Disabling /user_stats.xml");
+		}
 	}
 }
