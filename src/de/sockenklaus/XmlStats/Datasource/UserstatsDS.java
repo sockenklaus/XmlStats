@@ -16,6 +16,7 @@ package de.sockenklaus.XmlStats.Datasource;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 
 import com.nidefawl.Stats.Stats;
 import com.nidefawl.Stats.datasource.Category;
@@ -57,10 +58,10 @@ public class UserstatsDS extends Datasource {
 		return this.statsPlugin.getDataFolder();
 	}
 	
-	public HashMap<String, HashMap<String, Integer>> getAddedStats(){
+	public HashMap<String, HashMap<String, Integer>> getAddedStats(List<String> playerList){
 		HashMap <String, HashMap<String, Integer>> result = new HashMap<String, HashMap<String, Integer>>();
 		
-		for(String playerName : this.fetchAllPlayers()){
+		for(String playerName : playerList){
 			PlayerStat player = this.getPlayerStat(playerName);
 			
 			for(String catName : player.getCats()){

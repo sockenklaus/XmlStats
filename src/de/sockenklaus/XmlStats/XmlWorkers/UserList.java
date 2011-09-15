@@ -29,13 +29,13 @@ import de.sockenklaus.XmlStats.Datasource.UsersDS;
 /**
  * The Class XmlWorkerUsers.
  */
-public class XmlWorkerUsers extends XmlWorker {
+public class UserList extends XmlWorker {
 	
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
 	@Override
-	public Element getXML(Map<String, List<String>> parameters) {
+	public Element getXml(Map<String, List<String>> parameters) {
 		UsersDS users = new UsersDS();
 	
 		Element elem_users = this.doc.createElement("users");
@@ -75,6 +75,22 @@ public class XmlWorkerUsers extends XmlWorker {
 		 * Hier endet der XML-Aufbau
 		 */
 		return elem_users;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getSumXml(java.util.List, java.util.Map)
+	 */
+	@Override
+	protected Element getSumXml(List<String> playerList, Map<String, List<String>> parameters) {
+		return this.getXml(parameters);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getUserXml(java.util.List, java.util.Map)
+	 */
+	@Override
+	protected Element getUserXml(List<String> playerList, Map<String, List<String>> parameters) {
+		return this.getXml(parameters);
 	}
 	
 }

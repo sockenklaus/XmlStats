@@ -17,7 +17,6 @@ package de.sockenklaus.XmlStats.Datasource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import com.iConomy.iConomy;
 import com.iConomy.system.Account;
@@ -50,7 +49,7 @@ public class MoneyDS extends Datasource {
 	}
 	
 	@SuppressWarnings("static-access")
-	private Double getBalance(String playerName){
+	public Double getBalance(String playerName){
 		Double result = 0.0;
 		
 		if (XmlStats.checkiConomy()){

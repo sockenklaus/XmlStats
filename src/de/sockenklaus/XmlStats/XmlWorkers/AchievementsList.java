@@ -17,48 +17,43 @@ import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
  * @author socrates
  *
  */
-public class XmlWorkerAchievements extends XmlWorker {
+public class AchievementsList extends XmlWorker {
 
-	AchievementsDS achDS;
-	
-	public XmlWorkerAchievements(){
-		this.achDS = new AchievementsDS();
-	}
-	
 	/* (non-Javadoc)
-	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
+	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXml(java.util.Map)
 	 */
 	@Override
-	Element getXML(Map<String, List<String>> parameters) {
-
-			
-		HashMap<String, AchievementListData> achList = achDS.getAchievementsList();
+	protected Element getXml(Map<String, List<String>> parameters) {
+		HashMap<String, AchievementListData> achList = new AchievementsDS().getAchievementsList();
 
 		Element elem_achs = this.doc.createElement("achievements");
-
-		/*
-		 * Hier wird das XML aufgebaut
-		 */
-		if(parameters.containsKey("user")){
-			for (String playerName : parameters.get("user")){
-				elem_achs.appendChild(getPlayerAchievement(playerName));
-			}
+				
+		for(String achName : achList.keySet()){
+			elem_achs.appendChild(getAchievement(achList.get(achName)));
 		}
-		else {
-			for(String achName : achList.keySet()){
-				elem_achs.appendChild(getAchievement(achList.get(achName)));
-			}
-		}
-
-		/*
-		 * Hier endet der XML-Aufbau
-		 */
-		return elem_achs;
 		
+		return elem_achs;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getSumXml(java.util.List, java.util.Map)
+	 */
+	@Override
+	protected Element getSumXml(List<String> playerList, Map<String, List<String>> parameters) {
+		return this.getXml(parameters);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getUserXml(java.util.List, java.util.Map)
+	 */
+	@Override
+	protected Element getUserXml(List<String> playerList, Map<String, List<String>> parameters) {
+		return this.getXml(parameters);
 	}
 	
 	private Element getAchievement(AchievementListData data){
 		Element elem_ach = this.doc.createElement("achievement");
+		elem_ach.setAttribute("enabled", data.isEnabled()?"true":"false");
 				
 		Element elem_category = this.doc.createElement("category");
 		elem_category.setTextContent(data.getCategory());
@@ -82,13 +77,6 @@ public class XmlWorkerAchievements extends XmlWorker {
 		
 		return elem_ach;
 		
-	}
-	
-	private Element getPlayerAchievement(String playerName){
-		Element elem_player = this.doc.createElement("user");
-		elem_player.appendChild(getTextElem("name", playerName));
-		
-		return null;
 	}
 
 }

@@ -21,6 +21,7 @@ import de.sockenklaus.XmlStats.XmlStatsRegistry;
  */
 public class AchievementsDS extends Datasource {
 
+	//HashMap<String, PlayerAchievement> playerAchievementsList;
 	
 	public HashMap<String, AchievementListData> getAchievementsList(){
 		Achievements ach = (Achievements)XmlStatsRegistry.get("achievements");
@@ -31,7 +32,16 @@ public class AchievementsDS extends Datasource {
 		else return new HashMap<String, AchievementListData>();
 	}
 	
-	public PlayerAchievement getPlayerAchievement(String playerName){
+	/*public void refreshPlayerAchievements(){
+		PlayerAchievement pa;
+		Achievements ach = (Achievements)XmlStatsRegistry.get("achievements");
+		
+		if(ach.useSQL){
+			
+		}
+	}*/
+	
+	public PlayerAchievement getUserAchievement(String playerName){
 		
 		PlayerAchievement pa;
 		Achievements ach = (Achievements)XmlStatsRegistry.get("achievements");

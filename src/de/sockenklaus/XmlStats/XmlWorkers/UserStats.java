@@ -29,7 +29,7 @@ import de.sockenklaus.XmlStats.Datasource.UserstatsDS;
 /**
  * The Class XmlWorkerUserstats.
  */
-public class XmlWorkerUserstats extends XmlWorker {
+public class UserStats extends XmlWorker {
 	
 	/** The stats ds. */
 	private UserstatsDS statsDS;
@@ -37,37 +37,19 @@ public class XmlWorkerUserstats extends XmlWorker {
 	/**
 	 * Instantiates a new xml worker userstats.
 	 */
-	public XmlWorkerUserstats(){
+	public UserStats(){
 		this.statsDS = new UserstatsDS();
 	}
 	
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
-	public Element getXML(Map<String, List<String>> parameters) {
-
-		Element elem_userstats = this.doc.createElement("userstats");
+	public Element getXml(Map<String, List<String>> parameters) {
+		Element elem_error = this.doc.createElement("error");
+		elem_error.setAttribute("code", "1");
+		elem_error.setTextContent("No data provided with this query!");
 		
-		/*
-		 * Hier wird das XML aufgebaut
-		 */
-		if (!parameters.containsKey("player")){
-			// Generate a summarized XML
-			elem_userstats.setAttribute("type", "sum");
-			elem_userstats.appendChild(getAddedUpStatsElement());
-			}
-		else {
-			// Generate the XML for the given user(s)
-			for(String playerName : statsDS.fetchAllPlayers()){
-				if (parameters.containsKey("user") && parameters.get("user").contains(playerName.toLowerCase())){
-					elem_userstats.appendChild(getUserElement(playerName));
-				}
-			}
-		}
-		/*
-		 * Hier endet der XML-Aufbau
-		 */
-		return elem_userstats;
+		return elem_error;
 	}
 	
 	/**
@@ -107,12 +89,12 @@ public class XmlWorkerUserstats extends XmlWorker {
 	 *
 	 * @return the added up stats element
 	 */
-	private Element getAddedUpStatsElement(){
-		HashMap<String, HashMap<String, Integer>> addedStats = statsDS.getAddedStats();
-		Element elem_player = this.doc.createElement("user");
+	private Element getAddedUpStatsElement(List<String> playerList){
+		HashMap<String, HashMap<String, Integer>> addedStats = statsDS.getAddedStats(playerList);
+		Element elem_stats = this.doc.createElement("stats");
 		Element elem_cats = this.doc.createElement("categories");
 		
-		elem_player.appendChild(elem_cats);
+		elem_stats.appendChild(elem_cats);
 		
 		for (String catName : addedStats.keySet()){
 			Element elem_cat = this.doc.createElement("category");
@@ -128,7 +110,7 @@ public class XmlWorkerUserstats extends XmlWorker {
 			elem_cat.appendChild(elem_items);
 		}
 		
-		return elem_player;
+		return elem_stats;
 	}
 		
 	/**
@@ -146,4 +128,41 @@ public class XmlWorkerUserstats extends XmlWorker {
 		
 		return elem_item;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getSumXml(java.util.List, java.util.Map)
+	 */
+	@Override
+	protected Element getSumXml(List<String> playerList, Map<String, List<String>> parameters) {
+		Element elem_sum = this.doc.createElement("sum");
+		Element elem_users = this.doc.createElement("users");
+		
+		for (String userName : playerList){
+			Element elem_user = this.doc.createElement("user");
+			elem_user.appendChild(getTextElem("name", userName));
+			
+			elem_users.appendChild(elem_user);
+		}
+		
+		elem_sum.appendChild(elem_users);
+		elem_sum.appendChild(this.getAddedUpStatsElement(playerList));
+		
+		return elem_sum;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getUserXml(java.util.List, java.util.Map)
+	 */
+	@Override
+	protected Element getUserXml(List<String> playerList, Map<String, List<String>> parameters) {
+		Element elem_users = this.doc.createElement("users");
+		
+		for(String playerName : playerList){
+			elem_users.appendChild(this.getUserElement(playerName));
+		}
+		
+		return elem_users;
+	}
+
+
 }

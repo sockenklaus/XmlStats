@@ -45,6 +45,8 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
 import de.sockenklaus.XmlStats.XmlStats;
+import de.sockenklaus.XmlStats.Datasource.Datasource;
+import de.sockenklaus.XmlStats.Datasource.UsersDS;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -90,14 +92,39 @@ public abstract class XmlWorker implements HttpHandler {
 				this.result = new StreamResult(this.writer);
 				this.tf = TransformerFactory.newInstance();
 				this.transformer = this.tf.newTransformer();
-				
+				Datasource ds = new UsersDS();
 				Element root = this.doc.createElement("xmlstats");
+				List<String> playerList;
 				this.doc.appendChild(root);
 				/*
 				 * Actually create the XML
 				 */
-				root.appendChild(getXML(parameters));
-
+				
+				if(parameters.isEmpty()){
+					root.appendChild(getXml(parameters));
+				}
+				
+				else if(parameters.containsKey("user")){
+					if (parameters.get("user").contains("*")){
+						playerList = ds.fetchAllPlayers();
+					}
+					else {
+						playerList = parameters.get("user");
+					}
+					
+					root.appendChild(getUserXml(playerList, parameters));
+				}
+				
+				if(parameters.containsKey("sum")){
+					if(parameters.get("sum").contains("*")){
+						playerList = ds.fetchAllPlayers();
+					}
+					else {
+						playerList = parameters.get("sum");
+					}
+					root.appendChild(getSumXml(playerList, parameters));
+				}
+				
 				/*
 				 * Build string from XML
 				 */
@@ -163,6 +190,26 @@ public abstract class XmlWorker implements HttpHandler {
 	}
 	
 	/**
+	 * @param parameters
+	 * @return
+	 */
+	protected abstract Element getXml(Map<String, List<String>> parameters);
+
+	/**
+	 * @param playerList
+	 * @param parameters
+	 * @return
+	 */
+	protected abstract Element getSumXml(List<String> playerList, Map<String, List<String>> parameters);
+
+	/**
+	 * @param playerList
+	 * @param parameters
+	 * @return
+	 */
+	protected abstract Element getUserXml(List<String> playerList, Map<String, List<String>> parameters);
+
+	/**
 	 * Parses the parameters.
 	 *
 	 * @param queryString the query string
@@ -203,14 +250,6 @@ public abstract class XmlWorker implements HttpHandler {
 		}
 		return result;
 	}
-	
-	/**
-	 * Gets the xML.
-	 *
-	 * @param parameters the parameters
-	 * @return the xML
-	 */
-	abstract Element getXML(Map<String, List<String>> parameters);
 	
 	private byte[] compressData(byte[] input){
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -258,6 +297,12 @@ public abstract class XmlWorker implements HttpHandler {
 	protected Element getTextElem(String elemName, String text){
 		Element result = this.doc.createElement(elemName);
 		result.setTextContent(text);
+		return result;
+	}
+	
+	protected Element getTextElem(String elemName, int value){
+		Element result = this.doc.createElement(elemName);
+		result.setTextContent(String.valueOf(value));
 		return result;
 	}
 }

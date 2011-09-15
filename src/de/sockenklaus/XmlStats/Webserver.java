@@ -75,14 +75,14 @@ public class Webserver {
 		
 		this.server = HttpServer.create(this.address, 0);
 		
-		this.server.createContext("/user_list.xml", new XmlWorkerUsers());
+		this.server.createContext("/user_list.xml", new UserList());
 		
 		this.server.start();
 	}
 	
 	protected void startiConomy(){
 		if (this.isRunning() && XmlStats.checkiConomy()){
-			server.createContext("/user_balances.xml", new XmlWorkerMoney());
+			server.createContext("/user_balances.xml", new UserBalances());
 			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /user_balances.xml");
 		}
 		else {
@@ -92,7 +92,8 @@ public class Webserver {
 	
 	protected void startAchievements(){
 		if(this.isRunning() && XmlStats.checkAchievements()){
-			server.createContext("/user_achievements.xml", new XmlWorkerAchievements());
+			server.createContext("/user_achievements.xml", new UserAchievements());
+			server.createContext("/achievements_list.xml", new AchievementsList());
 			XmlStats.LogInfo("Achievements seems to be loaded correctly. Enabling /user_achievements.xml");
 		}
 		else {
@@ -102,7 +103,7 @@ public class Webserver {
 	
 	protected void startStats(){
 		if(this.isRunning() && XmlStats.checkStats()){
-			server.createContext("/user_stats.xml", new XmlWorkerUserstats());
+			server.createContext("/user_stats.xml", new UserStats());
 			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /user_stats.xml");
 		}
 		else {
