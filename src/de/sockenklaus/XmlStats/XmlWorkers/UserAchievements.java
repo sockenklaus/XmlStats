@@ -79,6 +79,7 @@ public class UserAchievements extends XmlWorker {
 	@Override
 	protected Element getUserXml(List<String> userList, Map<String, List<String>> parameters) {
 		Element elem_users = this.doc.createElement("users");
+		elem_users.setAttribute("count", String.valueOf(userList.size()));
 		
 		for(String userName : userList){
 			

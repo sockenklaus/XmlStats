@@ -38,6 +38,7 @@ public class UserBalances extends XmlWorker {
 	protected Element getUserXml(List<String> playerList, Map<String, List<String>> parameters){
 
 		Element elem_users = this.doc.createElement("users");
+		elem_users.setAttribute("count", String.valueOf(playerList.size()));
 		
 		for(String userName : playerList){
 			Element elem_user = this.doc.createElement("user");
@@ -71,6 +72,7 @@ public class UserBalances extends XmlWorker {
 			
 		Element elem_sum = this.doc.createElement("sum");
 		Element elem_users = this.doc.createElement("users");
+		elem_users.setAttribute("count", String.valueOf(userList.size()));
 		elem_users.setAttribute("type", "name");
 		elem_sum.appendChild(elem_users);
 		
