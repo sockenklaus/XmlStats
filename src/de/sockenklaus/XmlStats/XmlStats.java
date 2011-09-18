@@ -49,17 +49,13 @@ public class XmlStats extends JavaPlugin {
 		if(this.enabled && webserverTemp.isRunning()){
 			this.enabled = false;
 			
-			XmlStatsRegistry.flush();
-			LogDebug("Registry flushed.");
-				
 			webserverTemp.stop();
 			LogDebug("Webserver stopped.");
 			
+			XmlStatsRegistry.flush();
 			getServer().getScheduler().cancelTasks(this);
-			LogDebug("XmlStats killed.");
-			
 		}
-		LogInfo("Plugin Disabled");
+		LogInfo("XmlStats Disabled");
 	}
 
 	/* (non-Javadoc)

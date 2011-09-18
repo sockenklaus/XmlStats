@@ -54,6 +54,14 @@ public class AchievementsList extends XmlWorker {
 	private Element getAchievement(AchievementListData data){
 		Element elem_ach = this.doc.createElement("achievement");
 		elem_ach.setAttribute("enabled", data.isEnabled()?"true":"false");
+		
+		Element elem_achname = this.doc.createElement("name");
+		elem_achname.setTextContent(data.getName());
+		elem_ach.appendChild(elem_achname);
+		
+		Element elem_achdesc = this.doc.createElement("description");
+		elem_achdesc.setTextContent(data.getDescription());
+		elem_ach.appendChild(elem_achdesc);	
 				
 		Element elem_category = this.doc.createElement("category");
 		elem_category.setTextContent(data.getCategory());

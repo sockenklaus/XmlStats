@@ -36,6 +36,7 @@
  		
 		<jar jarfile="${dist}/${name}.jar">
 			<fileset dir="${bin}"/>
+			<fileset dir="${src}" includes="**/*.java" />
 		</jar>
 	</target>
  	

@@ -14,12 +14,15 @@
 */
 package de.sockenklaus.XmlStats.XmlWorkers;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
 import org.w3c.dom.Element;
 
+import com.nidefawl.Stats.ItemResolver.hModItemResolver;
 import com.nidefawl.Stats.datasource.Category;
 import com.nidefawl.Stats.datasource.PlayerStat;
 
@@ -33,12 +36,16 @@ public class UserStats extends XmlWorker {
 	
 	/** The stats ds. */
 	private UserstatsDS statsDS;
+	private hModItemResolver itemResolver;
+	private String[] resolveCats;
 	
 	/**
 	 * Instantiates a new xml worker userstats.
 	 */
 	public UserStats(){
 		this.statsDS = new UserstatsDS();
+		itemResolver = new hModItemResolver(new File(statsDS.getDataFolder(),"items.txt"));
+		resolveCats = new String[]{"blockdestroy", "blockcreate", "itemdrop", "itempickup"};
 	}
 	
 	/* (non-Javadoc)
@@ -77,8 +84,14 @@ public class UserStats extends XmlWorker {
 			elem_cat.appendChild(elem_items);
 			elem_cats.appendChild(elem_cat);
 			
-			for(String valName : cat.stats.keySet()){								
-				elem_items.appendChild(getItemElem(valName, cat.get(valName)));
+			for(String valName : cat.stats.keySet()){
+				Element elem_item = getItemElem(valName, cat.get(valName));
+				
+				if(Arrays.asList(resolveCats).contains(catName)){
+					elem_item.setAttribute("id", String.valueOf(itemResolver.getItem(valName)));
+				}
+				
+				elem_items.appendChild(elem_item);
 			}
 		}
 		return elem_player;
@@ -105,7 +118,13 @@ public class UserStats extends XmlWorker {
 			elem_cats.appendChild(elem_cat);
 				
 			for(String entryName : addedStats.get(catName).keySet()){
-				elem_items.appendChild(getItemElem(entryName, addedStats.get(catName).get(entryName)));
+				Element elem_item = this.getItemElem(entryName, addedStats.get(catName).get(entryName));
+				
+				if(Arrays.asList(resolveCats).contains(catName)){
+					elem_item.setAttribute("id", String.valueOf(itemResolver.getItem(entryName)));
+				}
+				
+				elem_items.appendChild(elem_item);
 			}
 			elem_cat.appendChild(elem_items);
 		}
@@ -122,7 +141,7 @@ public class UserStats extends XmlWorker {
 	 */
 	private Element getItemElem(String key, int value){
 		Element elem_item = this.doc.createElement("item");
-		
+				
 		elem_item.appendChild(getTextElem("name", key));
 		elem_item.appendChild(getTextElem("value", String.valueOf(value)));
 		
