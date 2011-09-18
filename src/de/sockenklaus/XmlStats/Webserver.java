@@ -72,14 +72,16 @@ public class Webserver {
 		this.server = null;
 		
 		this.address = new InetSocketAddress(port);
+		XmlStats.LogDebug("Opened socket on port "+port);
 		
 		this.server = HttpServer.create(this.address, 0);
+		XmlStats.LogDebug("Created webserver.");
 		
 		this.server.createContext("/user_list.xml", new UserList());
+		XmlStats.LogDebug("Created context /user_list.xml.");
 		
 		this.server.start();
-
-		this.server.start();
+		XmlStats.LogDebug("Started webserver.");
 	}
 	
 	protected void startiConomy(){
