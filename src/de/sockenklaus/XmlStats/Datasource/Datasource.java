@@ -16,6 +16,9 @@ package de.sockenklaus.XmlStats.Datasource;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+
+import de.sockenklaus.XmlStats.Exceptions.UserNotFoundException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -28,7 +31,7 @@ public abstract class Datasource {
 	 *
 	 * @return the array list
 	 */
-	public ArrayList<String> fetchAllPlayers(){
+	public static ArrayList<String> fetchAllPlayers(){
 		File[] files = new File("world/players").listFiles();
 		ArrayList<String> result = new ArrayList<String>();
 		
@@ -43,5 +46,19 @@ public abstract class Datasource {
 		}
 		
 		return result;
+	}
+	
+	public static boolean userExists(String player){
+		return fetchAllPlayers().contains(player);
+	}
+	
+	public static List<String> fetchValidUsers(List<String> list) throws UserNotFoundException{
+		ArrayList<String> output = new ArrayList<String>();
+		
+		for (String possibleUser : list){
+			if(Datasource.userExists(possibleUser)) output.add(possibleUser);
+		}
+		if(output.isEmpty()) throw new UserNotFoundException("No valid user has been found!");
+		else return output;
 	}
 }

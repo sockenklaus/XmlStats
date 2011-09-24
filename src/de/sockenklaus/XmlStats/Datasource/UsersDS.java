@@ -14,20 +14,9 @@
 */
 package de.sockenklaus.XmlStats.Datasource;
 
-import java.util.ArrayList;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class UsersDS.
  */
 public class UsersDS extends Datasource {
-	
-	/**
-	 * Gets the all players.
-	 *
-	 * @return the all players
-	 */
-	public ArrayList<String> getAllPlayers(){
-		return fetchAllPlayers();
-	}
 }

@@ -46,7 +46,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.Datasource.Datasource;
-import de.sockenklaus.XmlStats.Datasource.UsersDS;
+import de.sockenklaus.XmlStats.Exceptions.UserNotFoundException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -78,24 +78,38 @@ public abstract class XmlWorker implements HttpHandler {
 			/*
 			 * Parse the parameters
 			 */
+			this.factory = DocumentBuilderFactory.newInstance();
+			try {
+				this.builder = this.factory.newDocumentBuilder();
+			} catch (ParserConfigurationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			this.doc = this.builder.newDocument();
+			try {
+				this.source = new DOMSource(this.doc);
+				this.writer = new StringWriter();
+				this.result = new StreamResult(this.writer);
+				this.tf = TransformerFactory.newInstance();
+				this.transformer = this.tf.newTransformer();
+			} catch (TransformerConfigurationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+				
+			Element root = this.doc.createElement("xmlstats");
+			List<String> userList;
+			this.doc.appendChild(root);
+			
+			
 			try {
 				parameters = parseParameters(queryString);
 
 				/*
 				 * Create the XML doc stuff....
 				 */
-				this.factory = DocumentBuilderFactory.newInstance();
-				this.builder = this.factory.newDocumentBuilder();
-				this.doc = this.builder.newDocument();	
-				this.source = new DOMSource(this.doc);
-				this.writer = new StringWriter();
-				this.result = new StreamResult(this.writer);
-				this.tf = TransformerFactory.newInstance();
-				this.transformer = this.tf.newTransformer();
-				Datasource ds = new UsersDS();
-				Element root = this.doc.createElement("xmlstats");
-				List<String> playerList;
-				this.doc.appendChild(root);
+				
 				/*
 				 * Actually create the XML
 				 */
@@ -106,33 +120,32 @@ public abstract class XmlWorker implements HttpHandler {
 				
 				else if(parameters.containsKey("user")){
 					if (parameters.get("user").contains("*")){
-						playerList = ds.fetchAllPlayers();
+						userList = Datasource.fetchAllPlayers();
 					}
 					else {
-						playerList = parameters.get("user");
+						userList = Datasource.fetchValidUsers(parameters.get("user"));
 					}
 					
-					root.appendChild(getUserXml(playerList, parameters));
+					root.appendChild(getUserXml(userList, parameters));
 				}
 				
 				if(parameters.containsKey("sum")){
 					if(parameters.get("sum").contains("*")){
-						playerList = ds.fetchAllPlayers();
+						userList = Datasource.fetchAllPlayers();
 					}
 					else {
-						playerList = parameters.get("sum");
+						userList = Datasource.fetchValidUsers(parameters.get("sum"));
 					}
-					root.appendChild(getSumXml(playerList, parameters));
+					root.appendChild(getSumXml(userList, parameters));
 				}
 				
 				/*
 				 * Build string from XML
 				 */
 			}
-			catch(TransformerConfigurationException e){
-				
-			}
-			catch(ParserConfigurationException e){
+			catch(UserNotFoundException e){
+				root.setAttribute("status", "error");
+				root.appendChild(getTextElem("error", e.getMessage()));
 				
 			}
 			catch (UnsupportedEncodingException e) {
@@ -174,8 +187,6 @@ public abstract class XmlWorker implements HttpHandler {
 				exchange.getResponseBody().write(byteResponse);
 			}
 			
-			catch(UnsupportedEncodingException e){
-			}
 			catch(IOException ex){
 				XmlStats.LogError("Fehler beim Senden der HTTP-Antwort.");
 				XmlStats.LogError(ex.getMessage());
@@ -235,12 +246,13 @@ public abstract class XmlWorker implements HttpHandler {
 				}
 				
 				if(param.length > 1){
-					valueArr = URLDecoder.decode(param[1].toLowerCase(), System.getProperty("file.encoding")).split(",");
+					valueArr = URLDecoder.decode(param[1], System.getProperty("file.encoding")).split(",");
 				}
-				
+								
 				List<String> values = new ArrayList<String>();
 				for (String value : valueArr){
 					if (!values.contains(value)){
+						XmlStats.LogDebug("ParseParameters() found: "+key+" = "+value);
 						values.add(value);
 					}
 				}

@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 
 import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.XmlStatsRegistry;
-import de.sockenklaus.XmlStats.Datasource.UsersDS;
+import de.sockenklaus.XmlStats.Datasource.Datasource;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -36,10 +36,9 @@ public class UserList extends XmlWorker {
 	 */
 	@Override
 	public Element getXml(Map<String, List<String>> parameters) {
-		UsersDS users = new UsersDS();
 	
 		Element elem_users = this.doc.createElement("users");
-		elem_users.setAttribute("count", String.valueOf(users.getAllPlayers().size()));
+		elem_users.setAttribute("count", String.valueOf(Datasource.fetchAllPlayers().size()));
 		
 		/*
 		 * Get list online player names
@@ -62,7 +61,7 @@ public class UserList extends XmlWorker {
 		 * Hier wird das XML aufgebaut
 		 */
 
-		for(String playerName : users.getAllPlayers()){
+		for(String playerName : Datasource.fetchAllPlayers()){
 
 			Element elem_player = this.doc.createElement("user");
 			elem_player.appendChild(getTextElem("name", playerName));
