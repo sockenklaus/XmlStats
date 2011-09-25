@@ -45,6 +45,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
 import de.sockenklaus.XmlStats.XmlStats;
+import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Datasource.Datasource;
 import de.sockenklaus.XmlStats.Exceptions.UserNotFoundException;
 
@@ -102,6 +103,14 @@ public abstract class XmlWorker implements HttpHandler {
 			List<String> userList;
 			this.doc.appendChild(root);
 			
+			XmlStats xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
+			
+			Element server = this.doc.createElement("server");
+			server.appendChild(getTextElem("version", xmlstats.getServer().getVersion()));
+			server.appendChild(getTextElem("name", xmlstats.getServer().getServerName()));
+			server.appendChild(getTextElem("ip", xmlstats.getServer().getIp()));
+			
+			root.appendChild(server);
 			
 			try {
 				parameters = parseParameters(queryString);
@@ -114,11 +123,7 @@ public abstract class XmlWorker implements HttpHandler {
 				 * Actually create the XML
 				 */
 				
-				if(parameters.isEmpty()){
-					root.appendChild(getXml(parameters));
-				}
-				
-				else if(parameters.containsKey("user")){
+				if(parameters.containsKey("user")){
 					if (parameters.get("user").contains("*")){
 						userList = Datasource.fetchAllPlayers();
 					}
@@ -139,6 +144,9 @@ public abstract class XmlWorker implements HttpHandler {
 					root.appendChild(getSumXml(userList, parameters));
 				}
 				
+				if (!parameters.containsKey("sum") && !parameters.containsKey("user")){
+					root.appendChild(getXml(parameters));
+				}
 				/*
 				 * Build string from XML
 				 */
