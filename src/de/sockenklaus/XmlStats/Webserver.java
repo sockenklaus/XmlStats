@@ -29,6 +29,7 @@ public class Webserver {
 
 	private InetSocketAddress address;
 	private HttpServer server = null;
+	private XmlStats xmlstats = null;
 	
 	/**
 	 * Instantiates a new web server.
@@ -38,7 +39,7 @@ public class Webserver {
 	 */
 	public Webserver() throws IOException {		
 		Settings settingsTemp = (Settings)XmlStatsRegistry.get("settings");
-		
+		this.xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
 		this.start(settingsTemp.getInt("options.webserver-port"));
 	}
 	
@@ -84,18 +85,18 @@ public class Webserver {
 		XmlStats.LogDebug("Started webserver.");
 	}
 	
-	protected void startiConomy(){
-		if (this.isRunning() && XmlStats.checkiConomy()){
+	protected void startRegister(){
+		if (this.isRunning() && xmlstats.checkRegister()){
 			server.createContext("/user_balances.xml", new UserBalances());
-			XmlStats.LogInfo("iConomy seems to be loaded correctly. Enabling /user_balances.xml");
+			XmlStats.LogInfo("Register seems to be loaded correctly. Enabling /user_balances.xml");
 		}
 		else {
-			XmlStats.LogWarn("iConomy or webserver not loaded correctly. Disabling /users_balances.xml");
+			XmlStats.LogWarn("Register or webserver not loaded correctly. Disabling /users_balances.xml");
 		}
 	}
 	
 	protected void startAchievements(){
-		if(this.isRunning() && XmlStats.checkAchievements()){
+		if(this.isRunning() && xmlstats.checkAchievements()){
 			server.createContext("/user_achievements.xml", new UserAchievements());
 			server.createContext("/achievements_list.xml", new AchievementsList());
 			XmlStats.LogInfo("Achievements seems to be loaded correctly. Enabling /user_achievements.xml");
@@ -106,7 +107,7 @@ public class Webserver {
 	}
 	
 	protected void startStats(){
-		if(this.isRunning() && XmlStats.checkStats()){
+		if(this.isRunning() && xmlstats.checkStats()){
 			server.createContext("/user_stats.xml", new UserStats());
 			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /user_stats.xml");
 		}

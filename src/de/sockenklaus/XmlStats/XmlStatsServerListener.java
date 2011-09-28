@@ -47,8 +47,8 @@ public class XmlStatsServerListener extends ServerListener {
 		if(this.identifyPlugin(event, "achievements")){
 			this.plugin.hookAchievements();
 		}
-		if(this.identifyPlugin(event, "iconomy")){
-			this.plugin.hookiConomy();
+		if(this.identifyPlugin(event, "register")){
+			this.plugin.hookRegister();
 		}
 	}
 	

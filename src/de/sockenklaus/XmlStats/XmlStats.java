@@ -24,9 +24,10 @@ import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.iConomy.iConomy;
 import com.nidefawl.Achievements.Achievements;
 import com.nidefawl.Stats.Stats;
+import com.nijikokun.register.Register;
+import com.nijikokun.register.payment.Methods;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -143,21 +144,21 @@ public class XmlStats extends JavaPlugin {
 	 */
 	protected void hookPlugins(){
 		this.hookAchievements();
-		this.hookiConomy();
+		this.hookRegister();
 		this.hookStats();
 	}
 	
-	protected void hookiConomy(){
-		Plugin iConomyTemp = getServer().getPluginManager().getPlugin("iConomy");
+	protected void hookRegister(){
+		Plugin registerTemp = getServer().getPluginManager().getPlugin("Register");
 		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
 		
-        if (iConomyTemp != null && iConomyTemp.isEnabled() && iConomyTemp.getClass().getName().equals("com.iConomy.iConomy")) {
-        	XmlStatsRegistry.put("iconomy", (iConomy)iConomyTemp);
-            LogInfo("Hooked into iConomy");
-            webserver.startiConomy();
+        if (this.checkRegister()) {
+        	XmlStatsRegistry.put("register", (Register)registerTemp);
+            LogInfo("Hooked into Register");
+            webserver.startRegister();
         }
         else {
-        	LogWarn("iConomy not found! Can't hook into it.");
+        	LogWarn("Register or no payment method found! Can't hook into it.");
         }
 	}
 	
@@ -165,7 +166,7 @@ public class XmlStats extends JavaPlugin {
 		Plugin AchievementsTemp = getServer().getPluginManager().getPlugin("Achievements");
 		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
 		
-        if(AchievementsTemp != null && AchievementsTemp.isEnabled() && AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements")){
+        if(this.checkAchievements()){
         	XmlStatsRegistry.put("achievements", (Achievements)AchievementsTemp);
         	LogInfo("Hooked into Achievements!");
         	webserver.startAchievements();
@@ -179,7 +180,7 @@ public class XmlStats extends JavaPlugin {
 		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
 		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
 		
-		if(StatsTemp != null && StatsTemp.isEnabled() && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats")){
+		if(this.checkStats()){
         	XmlStatsRegistry.put("stats", (Stats)StatsTemp);
         	LogInfo("Hooked into Stats!");
         	webserver.startStats();
@@ -194,8 +195,8 @@ public class XmlStats extends JavaPlugin {
 	 *
 	 * @return true, if is stats hooked
 	 */
-	public static boolean checkStats(){
-		Stats StatsTemp = (Stats)XmlStatsRegistry.get("stats");
+	public boolean checkStats(){
+		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
 		
 		if(StatsTemp != null && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats") && StatsTemp.isEnabled()) return true;
 		return false;
@@ -206,10 +207,10 @@ public class XmlStats extends JavaPlugin {
 	 *
 	 * @return true, if is i conomy hooked
 	 */
-	public static boolean checkiConomy(){
-		iConomy iConomyTemp = (iConomy)XmlStatsRegistry.get("iconomy");
-		
-		if (iConomyTemp != null && iConomyTemp.getClass().getName().equals("com.iConomy.iConomy") && iConomyTemp.isEnabled()) return true;
+	public boolean checkRegister(){
+		Plugin registerTemp = getServer().getPluginManager().getPlugin("Register");
+				
+		if (registerTemp != null && registerTemp.getClass().getName().equals("com.nijikokun.register.Register") && registerTemp.isEnabled() && Methods.hasMethod()) return true;
 		return false;
 	}
 	
@@ -218,8 +219,8 @@ public class XmlStats extends JavaPlugin {
 	 *
 	 * @return true, if is Achievements hooked
 	 */
-	public static boolean checkAchievements(){
-		Achievements AchievementsTemp = (Achievements)XmlStatsRegistry.get("achievements");
+	public boolean checkAchievements(){
+		Plugin AchievementsTemp = getServer().getPluginManager().getPlugin("Achievements");
 		
 		if(AchievementsTemp != null && AchievementsTemp.getClass().getName().equals("com.nidefawl.Achievements.Achievements") && AchievementsTemp.isEnabled()) return true;
 		return false;

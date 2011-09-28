@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.iConomy.iConomy;
-import com.iConomy.system.Account;
-import com.iConomy.system.Holdings;
+import com.nijikokun.register.payment.Method;
+import com.nijikokun.register.payment.Method.MethodAccount;
+import com.nijikokun.register.payment.Methods;
 
 import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.XmlStatsRegistry;
@@ -30,12 +30,12 @@ import de.sockenklaus.XmlStats.XmlStatsRegistry;
  */
 public class MoneyDS extends Datasource {
 
-	private iConomy iConomy;
 	private ArrayList<String> allPlayers;
+	private XmlStats xmlstats;
 	
 	public MoneyDS(){
-		this.iConomy = (iConomy)XmlStatsRegistry.get("iconomy");
 		this.allPlayers = fetchAllPlayers();
+		this.xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
 	}
 	
 	public HashMap<String, Double> getBalances(){
@@ -48,24 +48,25 @@ public class MoneyDS extends Datasource {
 		return result;
 	}
 	
-	@SuppressWarnings("static-access")
 	public Double getBalance(String playerName){
 		Double result = 0.0;
-		
-		if (XmlStats.checkiConomy()){
-			if(this.iConomy.hasAccount(playerName)){
-				Account account = this.iConomy.getAccount(playerName);
+				
+		if (xmlstats.checkRegister()){
+			
+			Method paymentMethod = Methods.getMethod();
+			
+			if(paymentMethod.hasAccount(playerName)){
+				MethodAccount account = paymentMethod.getAccount(playerName);
 				
 				if (account != null){
-					Holdings balance = account.getHoldings();
-					result = balance.balance();
+					result =  account.balance();
 				}
 				else XmlStats.LogWarn("The player \""+playerName+"\" has an account but it isn't valid. Bad data will return.");
 			}
 			else XmlStats.LogWarn("The player \""+playerName+"\" doesn't have a bank account and this action will return bad data");
 		}
 		else {
-			XmlStats.LogError("Something went wrong! /money.xml shouldn't be enabled but it's datasource was called! This will return bad results.");
+			XmlStats.LogError("Something went wrong! /user_balances.xml shouldn't be enabled but it's datasource was called! This will return bad results.");
 		}
 		
 		return result;

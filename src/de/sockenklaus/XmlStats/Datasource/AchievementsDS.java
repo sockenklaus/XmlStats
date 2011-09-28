@@ -20,13 +20,17 @@ import de.sockenklaus.XmlStats.XmlStatsRegistry;
  *
  */
 public class AchievementsDS extends Datasource {
-
+	private XmlStats xmlstats = null;
+	
+	public AchievementsDS(){
+		this.xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
+	}
 	//HashMap<String, PlayerAchievement> playerAchievementsList;
 	
 	public HashMap<String, AchievementListData> getAchievementsList(){
 		Achievements ach = (Achievements)XmlStatsRegistry.get("achievements");
 		
-		if(XmlStats.checkAchievements()){
+		if(xmlstats.checkAchievements()){
 			return ach.achievementList;
 		}
 		else return new HashMap<String, AchievementListData>();

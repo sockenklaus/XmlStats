@@ -15,6 +15,7 @@
 		<pathelement location="lib/Stats.jar" />
 		<pathelement location="lib/iConomy.jar" />
 		<pathelement location="lib/bukkit-0.0.1-SNAPSHOT.jar" />
+		<pathelement location="lib/Register-1.5.jar" />
    	</path>
 	
 	<buildnumber file=".build.number" />
