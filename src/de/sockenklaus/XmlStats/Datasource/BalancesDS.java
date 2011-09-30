@@ -24,21 +24,22 @@ import com.nijikokun.register.payment.Methods;
 
 import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.XmlStatsRegistry;
+import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
 /**
  * The Class MoneyDS.
  */
-public class MoneyDS extends Datasource {
+public class BalancesDS extends Datasource {
 
 	private ArrayList<String> allPlayers;
 	private XmlStats xmlstats;
 	
-	public MoneyDS(){
+	public BalancesDS(){
 		this.allPlayers = fetchAllPlayers();
 		this.xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
 	}
 	
-	public HashMap<String, Double> getBalances(){
+	public HashMap<String, Double> getBalances() throws XmlStatsException {
 		HashMap<String, Double> result = new HashMap<String, Double>();
 		
 		for (String playerName : allPlayers){
@@ -48,7 +49,7 @@ public class MoneyDS extends Datasource {
 		return result;
 	}
 	
-	public Double getBalance(String playerName){
+	public Double getBalance(String playerName) throws XmlStatsException {
 		Double result = 0.0;
 				
 		if (xmlstats.checkRegister()){
@@ -61,13 +62,11 @@ public class MoneyDS extends Datasource {
 				if (account != null){
 					result =  account.balance();
 				}
-				else XmlStats.LogWarn("The player \""+playerName+"\" has an account but it isn't valid. Bad data will return.");
+				else throw new XmlStatsException("The player \""+playerName+"\" has an account but it isn't valid.");
 			}
-			else XmlStats.LogWarn("The player \""+playerName+"\" doesn't have a bank account and this action will return bad data");
+			else throw new XmlStatsException("The player \""+playerName+"\" doesn't have a bank account.");
 		}
-		else {
-			XmlStats.LogError("Something went wrong! /user_balances.xml shouldn't be enabled but it's datasource was called! This will return bad results.");
-		}
+		else throw new XmlStatsException("Something went wrong! /user_balances.xml shouldn't be enabled but it's datasource was called!");
 		
 		return result;
 	}
@@ -76,7 +75,7 @@ public class MoneyDS extends Datasource {
 	 * @param list
 	 * @return
 	 */
-	public int getSum(List<String> list) {
+	public int getSum(List<String> list) throws XmlStatsException {
 		int result = 0;
 		
 		for(String playerName : list){

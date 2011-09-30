@@ -86,6 +86,7 @@ public class Webserver {
 	}
 	
 	protected void startRegister(){
+		XmlStats.LogDebug("Casting startRegister()");
 		if (this.isRunning() && xmlstats.checkRegister()){
 			server.createContext("/user_balances.xml", new UserBalances());
 			XmlStats.LogInfo("Register seems to be loaded correctly. Enabling /user_balances.xml");

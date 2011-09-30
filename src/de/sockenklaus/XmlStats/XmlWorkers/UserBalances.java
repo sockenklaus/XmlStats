@@ -17,10 +17,12 @@ package de.sockenklaus.XmlStats.XmlWorkers;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
 import de.sockenklaus.XmlStats.XmlStats;
-import de.sockenklaus.XmlStats.Datasource.MoneyDS;
+import de.sockenklaus.XmlStats.Datasource.BalancesDS;
+import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -28,14 +30,14 @@ import de.sockenklaus.XmlStats.Datasource.MoneyDS;
  */
 public class UserBalances extends XmlWorker {
 
-	private MoneyDS moneyDS;
+	private BalancesDS moneyDS;
 	
 	public UserBalances(){
-		this.moneyDS = new MoneyDS();
+		this.moneyDS = new BalancesDS();
 	}
 	
 	
-	protected Element getUserXml(List<String> playerList, Map<String, List<String>> parameters){
+	protected Element getUserXml(List<String> playerList, Map<String, List<String>> parameters) throws XmlStatsException {
 
 		Element elem_users = this.doc.createElement("users");
 		elem_users.setAttribute("count", String.valueOf(playerList.size()));
@@ -55,12 +57,13 @@ public class UserBalances extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
 	@Override
-	public Element getXml(Map<String, List<String>> parameters) {
-		Element elem_error = this.doc.createElement("error");
+	public Element getXml(Map<String, List<String>> parameters) throws XmlStatsException {
+		/*Element elem_error = this.doc.createElement("error");
 		elem_error.setAttribute("code", "1");
 		elem_error.setTextContent("No data provided with this query!");
 		
-		return elem_error;
+		return elem_error;*/
+		throw new XmlStatsException("No data provided with this query!");
 	}
 
 
@@ -68,7 +71,7 @@ public class UserBalances extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getSumXml(java.util.List, java.util.Map)
 	 */
 	@Override
-	protected Element getSumXml(List<String> userList, Map<String, List<String>> parameters) {
+	protected Element getSumXml(List<String> userList, Map<String, List<String>> parameters) throws XmlStatsException {
 			
 		Element elem_sum = this.doc.createElement("sum");
 		Element elem_users = this.doc.createElement("users");

@@ -47,7 +47,7 @@ import com.sun.net.httpserver.HttpExchange;
 import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Datasource.Datasource;
-import de.sockenklaus.XmlStats.Exceptions.UserNotFoundException;
+import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -151,7 +151,7 @@ public abstract class XmlWorker implements HttpHandler {
 				 * Build string from XML
 				 */
 			}
-			catch(UserNotFoundException e){
+			catch(XmlStatsException e){
 				root.setAttribute("status", "error");
 				root.appendChild(getTextElem("error", e.getMessage()));
 				
@@ -212,21 +212,21 @@ public abstract class XmlWorker implements HttpHandler {
 	 * @param parameters
 	 * @return
 	 */
-	protected abstract Element getXml(Map<String, List<String>> parameters);
+	protected abstract Element getXml(Map<String, List<String>> parameters) throws XmlStatsException;
 
 	/**
 	 * @param playerList
 	 * @param parameters
 	 * @return
 	 */
-	protected abstract Element getSumXml(List<String> playerList, Map<String, List<String>> parameters);
+	protected abstract Element getSumXml(List<String> playerList, Map<String, List<String>> parameters) throws XmlStatsException;
 
 	/**
 	 * @param playerList
 	 * @param parameters
 	 * @return
 	 */
-	protected abstract Element getUserXml(List<String> playerList, Map<String, List<String>> parameters);
+	protected abstract Element getUserXml(List<String> playerList, Map<String, List<String>> parameters) throws XmlStatsException;
 
 	/**
 	 * Parses the parameters.
