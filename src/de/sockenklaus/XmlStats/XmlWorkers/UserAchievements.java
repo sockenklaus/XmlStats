@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import com.nidefawl.Achievements.PlayerAchievement;
 
 import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
+import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
 /**
  * @author socrates
@@ -28,12 +29,8 @@ public class UserAchievements extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
 	@Override
-	protected Element getXml(Map<String, List<String>> parameters) {
-		Element elem_error = this.doc.createElement("error");
-		elem_error.setAttribute("code", "1");
-		elem_error.setTextContent("No data provided with this query!");
-		
-		return elem_error;
+	protected Element getXml(Map<String, List<String>> parameters) throws XmlStatsException {
+		throw new XmlStatsException("No data provided with this query!");
 	}
 	
 	private Element getUserAchievement(String userName){
@@ -43,6 +40,7 @@ public class UserAchievements extends XmlWorker {
 		PlayerAchievement pa = achDS.getUserAchievement(userName);
 		
 		Element elem_achs = this.doc.createElement("achievements");
+		elem_achs.setAttribute("count", String.valueOf(pa.achievements.size()));
 		
 		for(String achName : pa.achievements.keySet()){
 			Element elem_ach = this.doc.createElement("achievement");
@@ -60,17 +58,8 @@ public class UserAchievements extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getSumXml(java.util.List, java.util.Map)
 	 */
 	@Override
-	protected Element getSumXml(List<String> playerList, Map<String, List<String>> parameters) {
-		if(parameters.containsKey("user")){
-			return null;
-		}
-		else {
-			Element elem_error = this.doc.createElement("error");
-			elem_error.setAttribute("code", "1");
-			elem_error.setTextContent("No data provided with this query!");
-			
-			return elem_error;
-		}
+	protected Element getSumXml(List<String> playerList, Map<String, List<String>> parameters) throws XmlStatsException {
+		throw new XmlStatsException("sum="+parameters.get("sum")+" does not deliver any data!");
 	}
 
 	/* (non-Javadoc)

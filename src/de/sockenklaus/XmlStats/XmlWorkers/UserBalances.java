@@ -58,11 +58,6 @@ public class UserBalances extends XmlWorker {
 	 */
 	@Override
 	public Element getXml(Map<String, List<String>> parameters) throws XmlStatsException {
-		/*Element elem_error = this.doc.createElement("error");
-		elem_error.setAttribute("code", "1");
-		elem_error.setTextContent("No data provided with this query!");
-		
-		return elem_error;*/
 		throw new XmlStatsException("No data provided with this query!");
 	}
 

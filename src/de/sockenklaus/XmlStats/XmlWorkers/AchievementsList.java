@@ -27,7 +27,8 @@ public class AchievementsList extends XmlWorker {
 		HashMap<String, AchievementListData> achList = new AchievementsDS().getAchievementsList();
 
 		Element elem_achs = this.doc.createElement("achievements");
-				
+		elem_achs.setAttribute("count", String.valueOf(achList.size()));	
+		
 		for(String achName : achList.keySet()){
 			elem_achs.appendChild(getAchievement(achList.get(achName)));
 		}

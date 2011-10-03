@@ -27,6 +27,7 @@ import com.nidefawl.Stats.datasource.Category;
 import com.nidefawl.Stats.datasource.PlayerStat;
 
 import de.sockenklaus.XmlStats.Datasource.UserstatsDS;
+import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -51,12 +52,8 @@ public class UserStats extends XmlWorker {
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
-	public Element getXml(Map<String, List<String>> parameters) {
-		Element elem_error = this.doc.createElement("error");
-		elem_error.setAttribute("code", "1");
-		elem_error.setTextContent("No data provided with this query!");
-		
-		return elem_error;
+	public Element getXml(Map<String, List<String>> parameters) throws XmlStatsException {
+		throw new XmlStatsException("No data provided with this query!");
 	}
 	
 	/**
@@ -71,6 +68,7 @@ public class UserStats extends XmlWorker {
 		
 		Element elem_player = this.doc.createElement("user");
 		Element elem_cats = this.doc.createElement("categories");
+		elem_cats.setAttribute("count", String.valueOf(player_stats.getCats().size()));
 	
 		elem_player.appendChild(getTextElem("name", playerName));
 		elem_player.appendChild(elem_cats);
@@ -79,6 +77,7 @@ public class UserStats extends XmlWorker {
 			Category cat = player_stats.get(catName);
 			Element elem_cat = this.doc.createElement("category");
 			Element elem_items = this.doc.createElement("items");
+			elem_items.setAttribute("count", String.valueOf(cat.stats.size()));
 			
 			elem_cat.appendChild(getTextElem("name", catName));
 			elem_cat.appendChild(elem_items);
@@ -106,12 +105,14 @@ public class UserStats extends XmlWorker {
 		HashMap<String, HashMap<String, Integer>> addedStats = statsDS.getAddedStats(playerList);
 		Element elem_stats = this.doc.createElement("stats");
 		Element elem_cats = this.doc.createElement("categories");
+		elem_cats.setAttribute("count", String.valueOf(addedStats.size()));
 		
 		elem_stats.appendChild(elem_cats);
 		
 		for (String catName : addedStats.keySet()){
 			Element elem_cat = this.doc.createElement("category");
 			Element elem_items = this.doc.createElement("items");
+			elem_items.setAttribute("count", String.valueOf(addedStats.get(catName).size()));
 			
 			elem_cat.appendChild(getTextElem("name", catName));
 			elem_cat.appendChild(elem_items);
