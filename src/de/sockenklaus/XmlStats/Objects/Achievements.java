@@ -3,7 +3,6 @@
  */
 package de.sockenklaus.XmlStats.Objects;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.w3c.dom.Document;
@@ -11,6 +10,7 @@ import org.w3c.dom.Element;
 
 import com.nidefawl.Achievements.AchievementListData;
 
+import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
 
 /**
@@ -18,13 +18,14 @@ import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
  *
  */
 public class Achievements extends Array {
-	protected ArrayList<Achievement> childNodes;
-	
+			
 	public Achievements(){
+		super();
+		XmlStats.LogDebug("Casting Achievements constructor");
 		AchievementsDS ads = new AchievementsDS();
 		
 		HashMap<String, AchievementListData> achList = ads.getAchievementsList();
-		
+			
 		for(String achName : achList.keySet()){
 			this.childNodes.add(new Achievement(achList.get(achName)));
 		}
@@ -34,7 +35,7 @@ public class Achievements extends Array {
 		Element result = doc.createElement("achievements");
 		result.setAttribute("count", this.getCountStr());
 		
-		for(Achievement ach : this.childNodes){
+		for(Elem ach : this.childNodes){
 			result.appendChild(ach.getXml(doc));
 		}
 		

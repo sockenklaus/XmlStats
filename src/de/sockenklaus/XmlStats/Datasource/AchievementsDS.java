@@ -31,6 +31,7 @@ public class AchievementsDS extends Datasource {
 		Achievements ach = (Achievements)XmlStatsRegistry.get("achievements");
 		
 		if(xmlstats.checkAchievements()){
+			XmlStats.LogDebug("Found "+ach.achievementList.size()+" achievements.");
 			return ach.achievementList;
 		}
 		else return new HashMap<String, AchievementListData>();

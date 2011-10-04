@@ -22,4 +22,10 @@ public abstract class Elem {
 		result.setTextContent(String.valueOf(value));
 		return result;
 	}
+
+	/**
+	 * @param doc
+	 * @return
+	 */
+	public abstract Element getXml(Document doc);
 }
