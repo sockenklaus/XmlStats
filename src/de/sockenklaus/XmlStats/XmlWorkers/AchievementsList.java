@@ -56,6 +56,7 @@ public class AchievementsList extends XmlWorker {
 		Element elem_ach = this.doc.createElement("achievement");
 		elem_ach.setAttribute("enabled", data.isEnabled()?"true":"false");
 		
+<<<<<<< HEAD
 		Element elem_achname = this.doc.createElement("name");
 		elem_achname.setTextContent(data.getName());
 		elem_ach.appendChild(elem_achname);
@@ -84,6 +85,16 @@ public class AchievementsList extends XmlWorker {
 		elem_commands.setTextContent(data.commands.toString());
 		elem_ach.appendChild(elem_commands);
 		
+=======
+		elem_ach.appendChild(getTextElem("name", data.getName()));
+		elem_ach.appendChild(getTextElem("description", data.getDescription()));
+		elem_ach.appendChild(getTextElem("category", data.getCategory()));
+		elem_ach.appendChild(getTextElem("stat", data.getKey()));
+		elem_ach.appendChild(getTextElem("value", data.getValue()));
+		elem_ach.appendChild(getTextElem("maxawards", data.getMaxawards()));
+		elem_ach.appendChild(getTextElem("commands", data.commands.toString()));
+			
+>>>>>>> parent of 40d9bce... Pushed version to 0.4. Did some work on object based XML generation.
 		return elem_ach;
 		
 	}
