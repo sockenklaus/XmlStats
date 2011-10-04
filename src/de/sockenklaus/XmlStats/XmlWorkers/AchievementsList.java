@@ -56,34 +56,14 @@ public class AchievementsList extends XmlWorker {
 		Element elem_ach = this.doc.createElement("achievement");
 		elem_ach.setAttribute("enabled", data.isEnabled()?"true":"false");
 		
-		Element elem_achname = this.doc.createElement("name");
-		elem_achname.setTextContent(data.getName());
-		elem_ach.appendChild(elem_achname);
-		
-		Element elem_achdesc = this.doc.createElement("description");
-		elem_achdesc.setTextContent(data.getDescription());
-		elem_ach.appendChild(elem_achdesc);	
-				
-		Element elem_category = this.doc.createElement("category");
-		elem_category.setTextContent(data.getCategory());
-		elem_ach.appendChild(elem_category);
-		
-		Element elem_stat = this.doc.createElement("stat");
-		elem_stat.setTextContent(data.getKey());
-		elem_ach.appendChild(elem_stat);
-		
-		Element elem_value = this.doc.createElement("value");
-		elem_value.setTextContent(String.valueOf(data.getValue()));
-		elem_ach.appendChild(elem_value);
-		
-		Element elem_maxawards = this.doc.createElement("maxawards");
-		elem_maxawards.setTextContent(String.valueOf(data.getMaxawards()));
-		elem_ach.appendChild(elem_maxawards);
-		
-		Element elem_commands = this.doc.createElement("commands");
-		elem_commands.setTextContent(data.commands.toString());
-		elem_ach.appendChild(elem_commands);
-		
+		elem_ach.appendChild(getTextElem("name", data.getName()));
+		elem_ach.appendChild(getTextElem("description", data.getDescription()));
+		elem_ach.appendChild(getTextElem("category", data.getCategory()));
+		elem_ach.appendChild(getTextElem("stat", data.getKey()));
+		elem_ach.appendChild(getTextElem("value", data.getValue()));
+		elem_ach.appendChild(getTextElem("maxawards", data.getMaxawards()));
+		elem_ach.appendChild(getTextElem("commands", data.commands.toString()));
+			
 		return elem_ach;
 		
 	}
