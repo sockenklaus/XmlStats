@@ -5,13 +5,12 @@ package de.sockenklaus.XmlStats.Objects;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * @author socrates
  *
  */
-public class Item extends Elem {
+public class Item extends Node {
 
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.Objects.Elem#getXml(org.w3c.dom.Document)

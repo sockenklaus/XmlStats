@@ -12,6 +12,14 @@ import org.w3c.dom.Element;
  */
 public class Categories extends Array {
 
+	/**
+	 * @param tagName
+	 */
+	public Categories() {
+		super("categories");
+		// TODO Auto-generated constructor stub
+	}
+
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.Objects.Array#getXml(org.w3c.dom.Document)
 	 */

@@ -5,13 +5,12 @@ package de.sockenklaus.XmlStats.Objects;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * @author socrates
  *
  */
-public class User extends Elem {
+public class User extends Node {
 
 	private String name;
 	

@@ -33,15 +33,4 @@ public class UserAchievements extends Achievements {
 		}
 		else throw new XmlStatsException("The given username is not valid.");
 	}
-	
-	public Element getXml(Document doc){
-		Element result = doc.createElement("achievements");
-		result.setAttribute("count", this.getCountStr());
-		
-		for(Elem ach : this.childNodes){
-			result.appendChild(ach.getXml(doc));
-		}
-		
-		return result;
-	}
 }
