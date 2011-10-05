@@ -18,9 +18,10 @@ import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
  *
  */
 public class Achievements extends Array {
-	protected ArrayList<Achievement> childNodes;
+	//protected ArrayList<Achievement> childNodes;
 	
 	public Achievements(){
+		super();
 		AchievementsDS ads = new AchievementsDS();
 		
 		HashMap<String, AchievementListData> achList = ads.getAchievementsList();
@@ -34,7 +35,7 @@ public class Achievements extends Array {
 		Element result = doc.createElement("achievements");
 		result.setAttribute("count", this.getCountStr());
 		
-		for(Achievement ach : this.childNodes){
+		for(Elem ach : this.childNodes){
 			result.appendChild(ach.getXml(doc));
 		}
 		

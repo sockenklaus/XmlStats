@@ -18,6 +18,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.World;
+
+import de.sockenklaus.XmlStats.XmlStats;
+import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
 // TODO: Auto-generated Javadoc
@@ -32,18 +36,24 @@ public abstract class Datasource {
 	 * @return the array list
 	 */
 	public static ArrayList<String> fetchAllPlayers(){
-		File[] files = new File("world/players").listFiles();
+		XmlStats xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
+		List<World> worlds = xmlstats.getServer().getWorlds();
 		ArrayList<String> result = new ArrayList<String>();
 		
-		for (int i = 0; i < files.length; i++){
-			int whereDot = files[i].getName().lastIndexOf('.');
+		for(World world : worlds){
+			File[] files = new File(world.getName()+"/players").listFiles();
 			
-			if (0 < whereDot && whereDot <= files[i].getName().length() - 2){
-				String playerName = files[i].getName().substring(0, whereDot);
+			for (File file : files){
+				int whereDot = file.getName().lastIndexOf('.');
 				
-				result.add(playerName);
+				if (0 < whereDot && whereDot <= file.getName().length() - 2){
+					String playerName = file.getName().substring(0, whereDot);
+					
+					if(!result.contains(playerName)) result.add(playerName);
+				}
 			}
 		}
+		
 		
 		return result;
 	}
