@@ -14,23 +14,24 @@ import com.nidefawl.Achievements.AchievementListData;
  */
 public class Achievement extends Elem {
 	
-	private String name;
-	private String description;
-	private String category;
-	private String stat;
-	private Integer value;
-	private Integer maxawards;
-	private String commands;
+	private Elem name;
+	private Elem description;
+	private Elem category;
+	private Elem stat;
+	private Elem value;
+	private Elem maxawards;
+	private Elem commands;
 	private Boolean enabled;
 	
 	public Achievement(AchievementListData ach){
-		this.name = ach.getName();
-		this.description = ach.getDescription();
-		this.category = ach.getCategory();
-		this.stat = ach.getKey();
-		this.value = ach.getValue();
-		this.maxawards = ach.getMaxawards();
-		this.commands = ach.commands.toString();
+		
+		this.name = new Elem("name", ach.getName());
+		this.description = new Elem("description", ach.getDescription());
+		this.category = new Elem("category", ach.getCategory());
+		this.stat = new Elem("stat", ach.getKey());
+		this.value = new Elem("value", ach.getValue());
+		this.maxawards = new Elem("maxawards", ach.getMaxawards());
+		this.commands = new Elem("commands", ach.commands.toString());
 		this.enabled = ach.isEnabled();
 	}
 	
@@ -42,14 +43,15 @@ public class Achievement extends Elem {
 		Element result = doc.createElement("achievement");
 		
 		result.setAttribute("enabled", this.enabled ?"true":"false");
-		result.appendChild(this.addXmlChild("name", this.name, doc));
-		result.appendChild(this.addXmlChild("description", this.description, doc));
-		result.appendChild(this.addXmlChild("category", this.category, doc));
-		result.appendChild(this.addXmlChild("stat", this.stat, doc));
-		result.appendChild(this.addXmlChild("value", this.value, doc));
-		result.appendChild(this.addXmlChild("maxawards", this.maxawards, doc));
-		result.appendChild(this.addXmlChild("commands", this.commands, doc));
-				
+		
+		result.appendChild(this.name.getXml(doc));
+		result.appendChild(this.description.getXml(doc));
+		result.appendChild(this.category.getXml(doc));
+		result.appendChild(this.stat.getXml(doc));
+		result.appendChild(this.value.getXml(doc));
+		result.appendChild(this.maxawards.getXml(doc));
+		result.appendChild(this.commands.getXml(doc));
+						
 		return result;
 	}
 }

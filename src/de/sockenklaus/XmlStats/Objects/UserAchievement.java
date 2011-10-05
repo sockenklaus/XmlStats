@@ -6,6 +6,8 @@ package de.sockenklaus.XmlStats.Objects;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.sockenklaus.XmlStats.XmlStats;
+
 /**
 * @author socrates
 *
@@ -18,6 +20,7 @@ public class UserAchievement extends Achievement {
 	public UserAchievement(String paName, com.nidefawl.Achievements.Achievement achievement){
 		this.name = paName;
 		this.count = achievement.getCount();
+		XmlStats.LogDebug("UserAchievement-const castet.");
 	}
 	
 	public Element getXml(Document doc){
