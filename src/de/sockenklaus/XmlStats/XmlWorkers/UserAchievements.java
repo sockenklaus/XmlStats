@@ -8,10 +8,11 @@ import java.util.Map;
 
 import org.w3c.dom.Element;
 
-import com.nidefawl.Achievements.PlayerAchievement;
-
 import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
+import de.sockenklaus.XmlStats.Objects.NodeUser;
+import de.sockenklaus.XmlStats.Objects.NodeUserAchievements;
+import de.sockenklaus.XmlStats.Objects.NodeUsers;
 
 /**
  * @author socrates
@@ -46,21 +47,15 @@ public class UserAchievements extends XmlWorker {
 	 */
 	@Override
 	protected Element getUserXml(List<String> userList, Map<String, List<String>> parameters) throws XmlStatsException{
-				
-		Element elem_users = this.doc.createElement("users");
-		elem_users.setAttribute("count", String.valueOf(userList.size()));
+		NodeUsers node_users = new NodeUsers();
 		
 		for(String userName : userList){
-			Element elem_player = this.doc.createElement("user");
-			elem_player.appendChild(getTextElem("name", userName));
-			
-			de.sockenklaus.XmlStats.Objects.UserAchievements ua = new de.sockenklaus.XmlStats.Objects.UserAchievements(userName);
-			elem_player.appendChild(ua.getXml(this.doc));
-			
-			elem_users.appendChild(elem_player);
+			NodeUser node_user = new NodeUser(userName);
+			node_user.appendChild(new NodeUserAchievements(userName));
+			node_users.appendChild(node_user);
 		}
 	
-		return elem_users;
+		return node_users.getXml(this.doc);
 	}
 
 }

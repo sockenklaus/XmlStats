@@ -13,16 +13,16 @@ import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
  * @author socrates
  *
  */
-public class Achievements extends Array {
+public class NodeAchievements extends NodeArray {
 
-	public Achievements(){
+	public NodeAchievements(){
 		super("achievements");
 		AchievementsDS ads = new AchievementsDS();
 		
 		HashMap<String, AchievementListData> achList = ads.getAchievementsList();
 		
 		for(String achName : achList.keySet()){
-			this.childNodes.add(new Achievement(achList.get(achName)));
+			this.childNodes.add(new NodeAchievement(achList.get(achName)));
 		}
 	}
 }

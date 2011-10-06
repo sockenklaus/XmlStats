@@ -10,21 +10,23 @@ import org.w3c.dom.Element;
  * @author socrates
  *
  */
-public class User extends Node {
+public class NodeItems extends NodeArray {
 
-	private String name;
-	
-	public User(String name){
-		this.name = name;
+	/**
+	 * @param tagName
+	 */
+	public NodeItems() {
+		super("items");
+		// TODO Auto-generated constructor stub
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see de.sockenklaus.XmlStats.Objects.Elem#getXml(org.w3c.dom.Document)
+	 * @see de.sockenklaus.XmlStats.Objects.Array#getXml(org.w3c.dom.Document)
 	 */
 	@Override
 	public Element getXml(Document doc) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 }

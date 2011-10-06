@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
  * @author socrates
  *
  */
-public abstract class NodeList extends Node {
+public class NodeList extends Node {
 	protected ArrayList<Node> childNodes;
 	
 	public NodeList(String tagName){
@@ -20,7 +20,7 @@ public abstract class NodeList extends Node {
 		this.tagName = tagName;
 	}
 	
-	public void addChild(Node child){
+	public void appendChild(Node child){
 		this.childNodes.add(child);
 	}
 	

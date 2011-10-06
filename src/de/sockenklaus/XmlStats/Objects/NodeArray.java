@@ -10,18 +10,10 @@ import org.w3c.dom.Element;
  * @author socrates
  *
  */
-public abstract class Array extends NodeList {
+public abstract class NodeArray extends NodeList {
 	
-	public Array(String tagName){
+	public NodeArray(String tagName){
 		super(tagName);
-	}
-	
-	public int getCountInt(){
-		return this.childNodes.size();
-	}
-	
-	public String getCountStr(){
-		return String.valueOf(this.childNodes.size());
 	}
 	
 	public Element getXml(Document doc){

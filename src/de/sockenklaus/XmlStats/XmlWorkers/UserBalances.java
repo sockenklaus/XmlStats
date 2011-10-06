@@ -17,12 +17,14 @@ package de.sockenklaus.XmlStats.XmlWorkers;
 import java.util.List;
 import java.util.Map;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
-import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.Datasource.BalancesDS;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
+import de.sockenklaus.XmlStats.Objects.NodeList;
+import de.sockenklaus.XmlStats.Objects.NodeText;
+import de.sockenklaus.XmlStats.Objects.NodeUser;
+import de.sockenklaus.XmlStats.Objects.NodeUsers;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -39,18 +41,16 @@ public class UserBalances extends XmlWorker {
 	
 	protected Element getUserXml(List<String> playerList, Map<String, List<String>> parameters) throws XmlStatsException {
 
-		Element elem_users = this.doc.createElement("users");
-		elem_users.setAttribute("count", String.valueOf(playerList.size()));
-		
+		NodeUsers node_users = new NodeUsers();
+				
 		for(String userName : playerList){
-			Element elem_user = this.doc.createElement("user");
-			elem_user.appendChild(getTextElem("name", userName));
-			elem_user.appendChild(getTextElem("balance", String.valueOf(moneyDS.getBalance(userName))));
-
-			elem_users.appendChild(elem_user);
+			NodeUser node_user = new NodeUser(userName);
+			node_user.appendChild(new NodeText("balance", moneyDS.getBalance(userName)));
+			
+			node_users.appendChild(node_user);
 		}
 		
-		return elem_users;
+		return node_users.getXml(this.doc);
 	}
 	
 	/* (non-Javadoc)
@@ -67,24 +67,20 @@ public class UserBalances extends XmlWorker {
 	 */
 	@Override
 	protected Element getSumXml(List<String> userList, Map<String, List<String>> parameters) throws XmlStatsException {
-			
-		Element elem_sum = this.doc.createElement("sum");
-		Element elem_users = this.doc.createElement("users");
-		elem_users.setAttribute("count", String.valueOf(userList.size()));
-		elem_users.setAttribute("type", "name");
-		elem_sum.appendChild(elem_users);
+		
+		NodeList node_sum = new NodeList("sum");
+		NodeUsers node_users = new NodeUsers();
+		
+		node_sum.appendChild(node_users);
 		
 		for(String userName : userList){
-			Element elem_user = this.doc.createElement("user");
-			elem_user.appendChild(getTextElem("name", userName));
-			elem_users.appendChild(elem_user);
-			XmlStats.LogDebug("Got "+userName);
+			NodeUser node_user = new NodeUser(userName);
+			node_users.appendChild(node_user);
 		}
 		
 		int sum = moneyDS.getSum(userList);
+		node_sum.appendChild(new NodeText("balance", sum));
 		
-		elem_sum.appendChild(getTextElem("balance", String.valueOf(sum)));
-		
-		return elem_sum;
+		return node_sum.getXml(this.doc);
 	}
 }

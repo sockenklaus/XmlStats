@@ -27,6 +27,11 @@ public class NodeText extends Node {
 		this(tagName);
 		this.textContent = intContent.toString();
 	}
+	
+	public NodeText(String tagName, Double dblContent){
+		this(tagName);
+		this.textContent = dblContent.toString();
+	}
 
 	public Element getXml(Document doc){
 		Element result = super.getXml(doc);

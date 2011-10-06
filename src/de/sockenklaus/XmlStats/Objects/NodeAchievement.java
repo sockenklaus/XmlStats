@@ -9,13 +9,13 @@ import com.nidefawl.Achievements.AchievementListData;
  * @author socrates
  *
  */
-public class Achievement extends NodeList {
+public class NodeAchievement extends NodeList {
 	
-	public Achievement(){
+	public NodeAchievement(){
 		super("achievement");
 	}
 	
-	public Achievement(AchievementListData ach){
+	public NodeAchievement(AchievementListData ach){
 		super("achievement");
 		
 		this.childNodes.add(new NodeText("name", ach.getName()));

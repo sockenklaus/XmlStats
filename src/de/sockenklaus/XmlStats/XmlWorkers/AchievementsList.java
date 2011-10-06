@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.w3c.dom.Element;
 
-import de.sockenklaus.XmlStats.Objects.Achievements;
+import de.sockenklaus.XmlStats.Objects.NodeAchievements;
 
 /**
  * @author socrates
@@ -21,7 +21,7 @@ public class AchievementsList extends XmlWorker {
 	 */
 	@Override
 	protected Element getXml(Map<String, List<String>> parameters) {
-		Achievements ach = new Achievements();
+		NodeAchievements ach = new NodeAchievements();
 		return ach.getXml(this.doc);
 	}
 
