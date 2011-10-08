@@ -3,8 +3,12 @@
  */
 package de.sockenklaus.XmlStats.Objects;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.io.File;
+
+import com.nidefawl.Stats.ItemResolver.hModItemResolver;
+import com.nidefawl.Stats.datasource.Category;
+
+import de.sockenklaus.XmlStats.Datasource.UserstatsDS;
 
 /**
  * @author socrates
@@ -13,20 +17,21 @@ import org.w3c.dom.Element;
 public class NodeItems extends NodeArray {
 
 	/**
-	 * @param tagName
+	 * @param category
 	 */
-	public NodeItems() {
+	public NodeItems(Category category, Boolean resolve) {
 		super("items");
-		// TODO Auto-generated constructor stub
-	}
-
-	/* (non-Javadoc)
-	 * @see de.sockenklaus.XmlStats.Objects.Array#getXml(org.w3c.dom.Document)
-	 */
-	@Override
-	public Element getXml(Document doc) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+		
+		hModItemResolver itemResolver = new hModItemResolver(new File(UserstatsDS.getDataFolder(),"items.txt"));
+				
+		for(String varName : category.getEntries()){
+			NodeItem node_item = new NodeItem(varName, category.get(varName));
+			
+			if(resolve){
+				node_item.setAttribute("id", itemResolver.getItem(varName));
+			}
+			
+			this.appendChild(new NodeItem(varName, category.get(varName)));
+		}
+	}	
 }

@@ -3,8 +3,9 @@
  */
 package de.sockenklaus.XmlStats.Objects;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import com.nidefawl.Stats.datasource.PlayerStat;
+
+import de.sockenklaus.XmlStats.Datasource.UserstatsDS;
 
 /**
  * @author socrates
@@ -12,11 +13,19 @@ import org.w3c.dom.Element;
  */
 public class NodeCategories extends NodeArray {
 
+	public NodeCategories(){
+		super("categories");
+	}
 	/**
 	 * @param tagName
 	 */
-	public NodeCategories() {
-		super("categories");
-	
+	public NodeCategories(String userName) {
+		this();
+		PlayerStat userStat = UserstatsDS.getPlayerStat(userName);
+		
+		for(String catName : userStat.getCats()){
+			NodeCategory node_cat = new NodeCategory(catName, userStat.get(catName));
+			this.appendChild(node_cat);
+		}
 	}
 }

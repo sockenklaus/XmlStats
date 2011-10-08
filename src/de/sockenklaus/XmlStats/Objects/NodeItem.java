@@ -3,22 +3,20 @@
  */
 package de.sockenklaus.XmlStats.Objects;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 /**
  * @author socrates
  *
  */
-public class NodeItem extends Node {
-
-	/* (non-Javadoc)
-	 * @see de.sockenklaus.XmlStats.Objects.Elem#getXml(org.w3c.dom.Document)
+public class NodeItem extends NodeList {
+	
+	/**
+	 * @param varName
+	 * @param i
 	 */
-	@Override
-	public Element getXml(Document doc) {
-		// TODO Auto-generated method stub
-		return null;
+	public NodeItem(String varName, int value) {
+		super("item");
+		
+		this.appendChild(new NodeText("name", varName));
+		this.appendChild(new NodeText("value", value));
 	}
-
 }

@@ -26,6 +26,15 @@ public abstract class Node {
 		this.attributes.put(name, value);
 	}
 	
+	/**
+	 * @param name
+	 * @param item
+	 */
+	public void setAttribute(String name, Integer value) {
+		this.setAttribute(name, value.toString());
+		
+	}
+	
 	public Element getXml(Document doc){
 		Element result = doc.createElement(this.tagName);
 		

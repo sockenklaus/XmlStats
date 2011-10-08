@@ -31,38 +31,23 @@ import de.sockenklaus.XmlStats.XmlStatsRegistry;
  */
 public class UserstatsDS extends Datasource {
 	
-	private Stats statsPlugin;
-
-	/**
-	 * Instantiates a new stats ds.
-	 */
-	public UserstatsDS() {
-		this.statsPlugin = (Stats)XmlStatsRegistry.get("stats");
-	}
-	
-	/**
-	 * Gets the plugin.
-	 *
-	 * @return the plugin
-	 */
-//	public Stats getPlugin() {
-	//	return this.statsPlugin;
-	//}
+	private static Stats statsPlugin;
 	
 	/**
 	 * Gets the data folder.
 	 *
 	 * @return the data folder
 	 */
-	public File getDataFolder(){
-		return this.statsPlugin.getDataFolder();
+	public static File getDataFolder(){
+		statsPlugin = (Stats)XmlStatsRegistry.get("stats");
+		return statsPlugin.getDataFolder();
 	}
 	
-	public HashMap<String, HashMap<String, Integer>> getAddedStats(List<String> playerList){
-		HashMap <String, HashMap<String, Integer>> result = new HashMap<String, HashMap<String, Integer>>();
-		
+	public static HashMap<String, Category> getAddedStats(List<String> playerList){
+		HashMap <String, Category> result = new HashMap<String, Category>();
+				
 		for(String playerName : playerList){
-			PlayerStat player = this.getPlayerStat(playerName);
+			PlayerStat player = getPlayerStat(playerName);
 			
 			for(String catName : player.getCats()){
 				Category cat = player.get(catName);
@@ -71,25 +56,19 @@ public class UserstatsDS extends Datasource {
 					Integer entry = cat.get(entryName);
 					
 					if(result.containsKey(catName)){
-						if(result.get(catName).containsKey(entryName)){
-							
-							if(entryName.equals("lastlogin") || entryName.equals("lastlogout")){
-								result.get(catName).put(entryName, Math.max(result.get(catName).get(entryName), entry));
-							}
-							else {
-								Integer tempInt = result.get(catName).get(entryName) + entry;
-								result.get(catName).put(entryName, tempInt);
-							}
-
+						
+						if(entryName.equals("lastlogin") || entryName.equals("lastlogout")){
+							result.get(catName).put(entryName, Math.max(result.get(catName).get(entryName), entry));
 						}
 						else {
-							result.get(catName).put(entryName, entry);
+							result.get(catName).add(entryName, entry);
 						}
+						
 					}
 					else {
-						HashMap<String, Integer> tempMap = new HashMap<String, Integer>();
-						tempMap.put(entryName, entry);
-						result.put(catName, tempMap);
+						Category tempCat = new Category();
+						tempCat.add(entryName, entry);
+						result.put(catName, tempCat);
 					}
 				}
 			}
@@ -98,8 +77,9 @@ public class UserstatsDS extends Datasource {
 		return result;
 	}
 
-	public PlayerStat getPlayerStat(String playerName){
-		PlayerStat result = new PlayerStatSQL(playerName, this.statsPlugin);
+	public static PlayerStat getPlayerStat(String playerName){
+		statsPlugin = (Stats)XmlStatsRegistry.get("stats");
+		PlayerStat result = new PlayerStatSQL(playerName, statsPlugin);
 		
 		result.load();
 		
