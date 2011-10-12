@@ -81,6 +81,12 @@ public class Webserver {
 		this.server.createContext("/user_list.xml", new UserList());
 		XmlStats.LogDebug("Created context /user_list.xml.");
 		
+		this.server.createContext("/auth_register.xml", new AuthRegister());
+		XmlStats.LogDebug("Created context /auth_register.xml.");
+		
+		this.server.createContext("auth_deregister.xml", new AuthDeregister());
+		XmlStats.LogDebug("Created context /auth_deregister.xml.");
+		
 		this.server.start();
 		XmlStats.LogDebug("Started webserver.");
 	}
