@@ -14,35 +14,64 @@
 */
 package de.sockenklaus.XmlStats.Datasource;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.plugin.Plugin;
+
+import com.nijikokun.register.Register;
 import com.nijikokun.register.payment.Method;
 import com.nijikokun.register.payment.Method.MethodAccount;
 import com.nijikokun.register.payment.Methods;
 
+import de.sockenklaus.XmlStats.Util;
+import de.sockenklaus.XmlStats.Webserver;
 import de.sockenklaus.XmlStats.XmlStats;
-import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
 /**
  * The Class MoneyDS.
  */
-public class BalancesDS extends Datasource {
-
-	private ArrayList<String> allPlayers;
-	private XmlStats xmlstats;
+public class RegisterDS extends Datasource {
 	
-	public BalancesDS(){
-		this.allPlayers = fetchAllPlayers();
-		this.xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
+	private static RegisterDS instance;
+	private Plugin register;
+	
+	private RegisterDS(){
+		super();
 	}
+	
+	private void hookRegister(){
+		Plugin registerTemp = this.xmlstats.getServer().getPluginManager().getPlugin("Register");
+		Webserver webserver = Webserver.getInstance();
+		
+		this.register = registerTemp;
+	    XmlStats.LogInfo("Hooked into Register");
+	    webserver.startRegister();
+	}
+	
+	public static RegisterDS getInstance(){
+		if(instance == null){
+			XmlStats.LogDebug("Theres no instance of RegisterDS");
+			if(Util.checkRegister()){
+				XmlStats.LogDebug("Seems like there's a working instancen of Register");
+				instance = new RegisterDS();
+				instance.hookRegister();
+			}
+			else {
+				XmlStats.LogWarn("Register or no payment method found. Will not hook into Register.");
+			}
+		}
+		return instance;
+		
+	}
+	
+
 	
 	public HashMap<String, Double> getBalances() throws XmlStatsException {
 		HashMap<String, Double> result = new HashMap<String, Double>();
 		
-		for (String playerName : allPlayers){
+		for (String playerName : fetchAllPlayers()){
 			result.put(playerName, getBalance(playerName));
 		}
 		
@@ -52,7 +81,7 @@ public class BalancesDS extends Datasource {
 	public Double getBalance(String playerName) throws XmlStatsException {
 		Double result = 0.0;
 				
-		if (xmlstats.checkRegister()){
+		if (Util.checkRegister()){
 			
 			Method paymentMethod = Methods.getMethod();
 			
@@ -79,9 +108,13 @@ public class BalancesDS extends Datasource {
 		int result = 0;
 		
 		for(String playerName : list){
-			result+=this.getBalance(playerName);
+			result+=getBalance(playerName);
 		}
 		
 		return result;
+	}
+	
+	public Register getRegister(){
+		return (Register)this.register;
 	}
 }

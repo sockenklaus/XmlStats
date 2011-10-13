@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.w3c.dom.Element;
 
-import de.sockenklaus.XmlStats.Datasource.BalancesDS;
+import de.sockenklaus.XmlStats.Datasource.RegisterDS;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 import de.sockenklaus.XmlStats.Objects.NodeList;
 import de.sockenklaus.XmlStats.Objects.NodeText;
@@ -31,11 +31,11 @@ import de.sockenklaus.XmlStats.Objects.NodeUsers;
  * The Class XmlWorkerMoney.
  */
 public class UserBalances extends XmlWorker {
-
-	private BalancesDS moneyDS;
+	
+	private RegisterDS regDS;
 	
 	public UserBalances(){
-		this.moneyDS = new BalancesDS();
+		this.regDS = RegisterDS.getInstance();
 	}
 	
 	
@@ -45,7 +45,7 @@ public class UserBalances extends XmlWorker {
 				
 		for(String userName : playerList){
 			NodeUser node_user = new NodeUser(userName);
-			node_user.appendChild(new NodeText("balance", moneyDS.getBalance(userName)));
+			node_user.appendChild(new NodeText("balance", this.regDS.getBalance(userName)));
 			
 			node_users.appendChild(node_user);
 		}
@@ -78,7 +78,7 @@ public class UserBalances extends XmlWorker {
 			node_users.appendChild(node_user);
 		}
 		
-		int sum = moneyDS.getSum(userList);
+		int sum = this.regDS.getSum(userList);
 		node_sum.appendChild(new NodeText("balance", sum));
 		
 		return node_sum.getXml(this.doc);

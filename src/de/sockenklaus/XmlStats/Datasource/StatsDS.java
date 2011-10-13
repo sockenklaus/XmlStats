@@ -18,32 +18,57 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.plugin.Plugin;
+
 import com.nidefawl.Stats.Stats;
 import com.nidefawl.Stats.datasource.Category;
 import com.nidefawl.Stats.datasource.PlayerStat;
 import com.nidefawl.Stats.datasource.PlayerStatSQL;
 
-import de.sockenklaus.XmlStats.XmlStatsRegistry;
+import de.sockenklaus.XmlStats.Util;
+import de.sockenklaus.XmlStats.Webserver;
+import de.sockenklaus.XmlStats.XmlStats;
+//import de.sockenklaus.XmlStats.XmlStatsRegistry;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class StatsDS.
  */
-public class UserstatsDS extends Datasource {
+public class StatsDS extends Datasource {
 	
-	private static Stats statsPlugin;
+	private static StatsDS instance;
+	private Plugin stats;
 	
+	
+	private StatsDS(){
+		super();
+	}
+	
+	public static StatsDS getInstance(){
+		XmlStats.LogDebug("Let's get an instance of StatsDS");
+		if(instance == null){
+			XmlStats.LogDebug("There's no instance of StatsDS.");
+			if(Util.checkStats()){
+				XmlStats.LogDebug("Looks like Stats is up and running.");
+				instance = new StatsDS();
+				instance.hookStats();
+			}
+			else {
+				XmlStats.LogWarn("Stats not found! Can't hook into it.");
+			}
+		}
+		return instance;
+	}
 	/**
 	 * Gets the data folder.
 	 *
 	 * @return the data folder
 	 */
-	public static File getDataFolder(){
-		statsPlugin = (Stats)XmlStatsRegistry.get("stats");
-		return statsPlugin.getDataFolder();
+	public File getDataFolder(){		
+		return this.stats.getDataFolder();
 	}
 	
-	public static HashMap<String, Category> getAddedStats(List<String> playerList){
+	public HashMap<String, Category> getAddedStats(List<String> playerList){
 		HashMap <String, Category> result = new HashMap<String, Category>();
 				
 		for(String playerName : playerList){
@@ -77,12 +102,27 @@ public class UserstatsDS extends Datasource {
 		return result;
 	}
 
-	public static PlayerStat getPlayerStat(String playerName){
-		statsPlugin = (Stats)XmlStatsRegistry.get("stats");
-		PlayerStat result = new PlayerStatSQL(playerName, statsPlugin);
+	public PlayerStat getPlayerStat(String playerName){
+			
+		PlayerStat result = new PlayerStatSQL(playerName, this.getStats());
 		
 		result.load();
 		
 		return result;
+	}
+	
+	private void hookStats(){
+		Plugin StatsTemp = xmlstats.getServer().getPluginManager().getPlugin("Stats");
+		Webserver webserver = Webserver.getInstance();
+		
+        this.stats = StatsTemp;
+        XmlStats.LogInfo("Hooked into Stats!");
+        webserver.startStats();
+	}
+	
+
+	
+	public Stats getStats(){
+		return (Stats)this.stats;
 	}
 }

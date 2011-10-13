@@ -7,7 +7,6 @@ import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
 import de.sockenklaus.XmlStats.XmlStats;
-import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Datasource.Datasource;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
@@ -19,8 +18,8 @@ public class NodeUser extends NodeList {
 	
 	public NodeUser(String name) throws XmlStatsException{
 		super("user");
-		if (Datasource.userExists(name)){
-			Server server = ((XmlStats)XmlStatsRegistry.get("xmlstats")).getServer();
+		if (Datasource.getInstance().userExists(name)){
+			Server server = XmlStats.getInstance().getServer();
 			Player player = server.getPlayer(name);
 
 			String status = (player != null && player.isOnline()) ?"online":"offline";

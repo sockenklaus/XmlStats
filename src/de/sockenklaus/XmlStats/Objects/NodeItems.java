@@ -8,7 +8,7 @@ import java.io.File;
 import com.nidefawl.Stats.ItemResolver.hModItemResolver;
 import com.nidefawl.Stats.datasource.Category;
 
-import de.sockenklaus.XmlStats.Datasource.UserstatsDS;
+import de.sockenklaus.XmlStats.Datasource.StatsDS;
 
 /**
  * @author socrates
@@ -22,7 +22,7 @@ public class NodeItems extends NodeArray {
 	public NodeItems(Category category, Boolean resolve) {
 		super("items");
 		
-		hModItemResolver itemResolver = new hModItemResolver(new File(UserstatsDS.getDataFolder(),"items.txt"));
+		hModItemResolver itemResolver = new hModItemResolver(new File(StatsDS.getInstance().getDataFolder(),"items.txt"));
 				
 		for(String varName : category.getEntries()){
 			NodeItem node_item = new NodeItem(varName, category.get(varName));

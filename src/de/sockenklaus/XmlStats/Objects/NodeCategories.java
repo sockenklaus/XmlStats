@@ -5,7 +5,7 @@ package de.sockenklaus.XmlStats.Objects;
 
 import com.nidefawl.Stats.datasource.PlayerStat;
 
-import de.sockenklaus.XmlStats.Datasource.UserstatsDS;
+import de.sockenklaus.XmlStats.Datasource.StatsDS;
 
 /**
  * @author socrates
@@ -21,7 +21,7 @@ public class NodeCategories extends NodeArray {
 	 */
 	public NodeCategories(String userName) {
 		this();
-		PlayerStat userStat = UserstatsDS.getPlayerStat(userName);
+		PlayerStat userStat = StatsDS.getInstance().getPlayerStat(userName);
 		
 		for(String catName : userStat.getCats()){
 			NodeCategory node_cat = new NodeCategory(catName, userStat.get(catName));

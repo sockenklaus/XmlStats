@@ -17,9 +17,8 @@ public class NodeAchievements extends NodeArray {
 
 	public NodeAchievements(){
 		super("achievements");
-		AchievementsDS ads = new AchievementsDS();
-		
-		HashMap<String, AchievementListData> achList = ads.getAchievementsList();
+				
+		HashMap<String, AchievementListData> achList = AchievementsDS.getInstance().getAchievementsList();
 		
 		for(String achName : achList.keySet()){
 			this.childNodes.add(new NodeAchievement(achList.get(achName)));

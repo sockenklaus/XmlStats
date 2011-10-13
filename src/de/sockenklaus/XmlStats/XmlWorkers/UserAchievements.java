@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.w3c.dom.Element;
 
-import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 import de.sockenklaus.XmlStats.Objects.NodeUser;
 import de.sockenklaus.XmlStats.Objects.NodeUserAchievements;
@@ -19,12 +18,6 @@ import de.sockenklaus.XmlStats.Objects.NodeUsers;
  *
  */
 public class UserAchievements extends XmlWorker {
-
-	AchievementsDS achDS;
-	
-	public UserAchievements(){
-		this.achDS = new AchievementsDS();
-	}
 	
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)

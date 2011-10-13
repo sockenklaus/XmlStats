@@ -19,6 +19,9 @@ import java.net.InetSocketAddress;
 
 import com.sun.net.httpserver.HttpServer;
 
+import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
+import de.sockenklaus.XmlStats.Datasource.RegisterDS;
+import de.sockenklaus.XmlStats.Datasource.StatsDS;
 import de.sockenklaus.XmlStats.XmlWorkers.*;
 
 // TODO: Auto-generated Javadoc
@@ -29,7 +32,8 @@ public class Webserver {
 
 	private InetSocketAddress address;
 	private HttpServer server = null;
-	private XmlStats xmlstats = null;
+	private static Webserver instance;
+	private Settings settings;
 	
 	/**
 	 * Instantiates a new web server.
@@ -37,10 +41,23 @@ public class Webserver {
 	 * @param port the port
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public Webserver() throws IOException {		
-		Settings settingsTemp = (Settings)XmlStatsRegistry.get("settings");
-		this.xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
-		this.start(settingsTemp.getInt("options.webserver-port"));
+	private Webserver() throws IOException {		
+		this.settings = Settings.getInstance();
+		this.start(this.settings.getInt("options.webserver-port"));
+	}
+	
+	public static synchronized Webserver getInstance() {
+		if(instance == null) {
+			try {
+				instance = new Webserver();
+			}
+			catch (IOException ex){
+				XmlStats.LogError("An error occured while creating the webserver!");
+				XmlStats.LogError(ex.getMessage());
+				ex.printStackTrace();
+			}
+		}
+		return instance;
 	}
 	
 	/**
@@ -62,10 +79,8 @@ public class Webserver {
 	
 	public void reload() throws IOException {
 		this.stop();
-		
-		Settings settingsTemp = (Settings)XmlStatsRegistry.get("settings");
-		
-		this.start(settingsTemp.getInt("options.webserver-port"));
+				
+		this.start(this.settings.getInt("options.webserver-port"));
 	}
 	
 	private void start(int port) throws IOException {
@@ -84,16 +99,16 @@ public class Webserver {
 		this.server.createContext("/auth_register.xml", new AuthRegister());
 		XmlStats.LogDebug("Created context /auth_register.xml.");
 		
-		this.server.createContext("auth_deregister.xml", new AuthDeregister());
+		this.server.createContext("/auth_deregister.xml", new AuthDeregister());
 		XmlStats.LogDebug("Created context /auth_deregister.xml.");
 		
 		this.server.start();
 		XmlStats.LogDebug("Started webserver.");
 	}
 	
-	protected void startRegister(){
+	public void startRegister(){
 		XmlStats.LogDebug("Casting startRegister()");
-		if (this.isRunning() && xmlstats.checkRegister()){
+		if (this.isRunning() && Util.checkRegister()){
 			server.createContext("/user_balances.xml", new UserBalances());
 			XmlStats.LogInfo("Register seems to be loaded correctly. Enabling /user_balances.xml");
 		}
@@ -102,8 +117,8 @@ public class Webserver {
 		}
 	}
 	
-	protected void startAchievements(){
-		if(this.isRunning() && xmlstats.checkAchievements()){
+	public void startAchievements(){
+		if(this.isRunning() && Util.checkAchievements()){
 			server.createContext("/user_achievements.xml", new UserAchievements());
 			server.createContext("/achievements_list.xml", new AchievementsList());
 			XmlStats.LogInfo("Achievements seems to be loaded correctly. Enabling /user_achievements.xml");
@@ -113,8 +128,8 @@ public class Webserver {
 		}
 	}
 	
-	protected void startStats(){
-		if(this.isRunning() && xmlstats.checkStats()){
+	public void startStats(){
+		if(this.isRunning() && Util.checkStats()){
 			server.createContext("/user_stats.xml", new UserStats());
 			XmlStats.LogInfo("Stats seems to be loaded correctly. Enabling /user_stats.xml");
 		}

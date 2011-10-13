@@ -21,23 +21,34 @@ import java.util.List;
 import org.bukkit.World;
 
 import de.sockenklaus.XmlStats.XmlStats;
-import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Datasource.
  */
-public abstract class Datasource {
+public class Datasource {
 	
+	private static Datasource instance;
+	protected XmlStats xmlstats;
+	
+	protected Datasource(){
+		this.xmlstats = XmlStats.getInstance();
+	}
+	
+	public static Datasource getInstance(){
+		if(instance == null) instance = new Datasource();
+		return instance;
+		
+	}
+		
 	/**
 	 * Fetch all players.
 	 *
 	 * @return the array list
 	 */
-	public static ArrayList<String> fetchAllPlayers(){
-		XmlStats xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
-		List<World> worlds = xmlstats.getServer().getWorlds();
+	public ArrayList<String> fetchAllPlayers(){
+		List<World> worlds = this.xmlstats.getServer().getWorlds();
 		ArrayList<String> result = new ArrayList<String>();
 		
 		for(World world : worlds){
@@ -58,17 +69,18 @@ public abstract class Datasource {
 		return result;
 	}
 	
-	public static boolean userExists(String player){
-		return fetchAllPlayers().contains(player);
+	public boolean userExists(String player){
+		return this.fetchAllPlayers().contains(player);
 	}
 	
-	public static List<String> fetchValidUsers(List<String> list) throws XmlStatsException{
+	public List<String> fetchValidUsers(List<String> list) throws XmlStatsException{
 		ArrayList<String> output = new ArrayList<String>();
 		
 		for (String possibleUser : list){
-			if(Datasource.userExists(possibleUser)) output.add(possibleUser);
+			if(this.userExists(possibleUser)) output.add(possibleUser);
 		}
 		if(output.isEmpty()) throw new XmlStatsException("No valid user has been found!");
 		else return output;
 	}
+	
 }

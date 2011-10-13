@@ -25,6 +25,7 @@ import org.bukkit.util.config.Configuration;
 public class Settings {
 	
 	private static final String configFilename = "config.yml";
+	private static Settings instance;
 	private Configuration conf;
 	
 	/**
@@ -32,8 +33,8 @@ public class Settings {
 	 *
 	 * @param xmlStats the xml stats
 	 */
-	public Settings(XmlStats xmlStats){
-		File f = new File(xmlStats.getDataFolder(), configFilename);
+	private Settings(){
+		File f = new File(XmlStats.getInstance().getDataFolder(), configFilename);
 		
 		conf = new Configuration(f);
 		if(f.exists()){
@@ -45,6 +46,11 @@ public class Settings {
 			conf.setProperty("options.verbose-enabled", true);
 			conf.save();
 		}
+	}
+	
+	public static synchronized Settings getInstance(){
+		if(instance == null) instance = new Settings();
+		return instance;
 	}
 	
 	/**

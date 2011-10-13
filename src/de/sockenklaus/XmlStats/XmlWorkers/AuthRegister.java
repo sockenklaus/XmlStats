@@ -11,7 +11,6 @@ import org.bukkit.util.config.Configuration;
 import org.w3c.dom.Element;
 
 import de.sockenklaus.XmlStats.XmlStats;
-import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
 /**
@@ -37,7 +36,7 @@ public class AuthRegister extends XmlWorker {
 
 		if(parameters.containsKey("key")){
 			for (String key : parameters.get("key")){
-				XmlStats x_temp = (XmlStats)XmlStatsRegistry.get("xmlstats");
+				XmlStats x_temp = XmlStats.getInstance();
 				File authKeyFile = new File(x_temp.getDataFolder(), this.authKeyFilename);
 				
 				Configuration authKeyConf = new Configuration(authKeyFile);

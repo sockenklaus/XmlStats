@@ -38,7 +38,7 @@ public class UserList extends XmlWorker {
 	
 		NodeUsers node_users = new NodeUsers();
 
-		for(String playerName : Datasource.fetchAllPlayers()){
+		for(String playerName : Datasource.getInstance().fetchAllPlayers()){
 			node_users.appendChild(new NodeUser(playerName));
 		}
 

@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 
 import com.nidefawl.Stats.datasource.Category;
 
-import de.sockenklaus.XmlStats.Datasource.UserstatsDS;
+import de.sockenklaus.XmlStats.Datasource.StatsDS;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 import de.sockenklaus.XmlStats.Objects.NodeCategories;
 import de.sockenklaus.XmlStats.Objects.NodeCategory;
@@ -59,7 +59,7 @@ public class UserStats extends XmlWorker {
 			node_users.appendChild(new NodeUser(userName));
 		}
 		
-		HashMap<String, Category> addedStats = UserstatsDS.getAddedStats(playerList);
+		HashMap<String, Category> addedStats = StatsDS.getInstance().getAddedStats(playerList);
 		
 		for(String catName : addedStats.keySet()){
 			NodeCategory node_cat = new NodeCategory(catName, addedStats.get(catName));

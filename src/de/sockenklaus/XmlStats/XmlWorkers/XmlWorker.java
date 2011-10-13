@@ -45,7 +45,6 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
 import de.sockenklaus.XmlStats.XmlStats;
-import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Datasource.Datasource;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
@@ -68,7 +67,7 @@ public abstract class XmlWorker implements HttpHandler {
 	 */
 	public void handle(HttpExchange exchange) {
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
-		
+		Datasource datasource = Datasource.getInstance();
 		Headers headers = exchange.getRequestHeaders();
 		
 		if("get".equalsIgnoreCase(exchange.getRequestMethod())){
@@ -103,7 +102,7 @@ public abstract class XmlWorker implements HttpHandler {
 			List<String> userList;
 			this.doc.appendChild(root);
 			
-			XmlStats xmlstats = (XmlStats)XmlStatsRegistry.get("xmlstats");
+			XmlStats xmlstats = XmlStats.getInstance();
 			
 			Element server = this.doc.createElement("server");
 			server.appendChild(getTextElem("version", xmlstats.getServer().getVersion()));
@@ -125,10 +124,10 @@ public abstract class XmlWorker implements HttpHandler {
 				
 				if(parameters.containsKey("user")){
 					if (parameters.get("user").contains("*")){
-						userList = Datasource.fetchAllPlayers();
+						userList = datasource.fetchAllPlayers();
 					}
 					else {
-						userList = Datasource.fetchValidUsers(parameters.get("user"));
+						userList = datasource.fetchValidUsers(parameters.get("user"));
 					}
 					
 					root.appendChild(getUserXml(userList, parameters));
@@ -136,10 +135,10 @@ public abstract class XmlWorker implements HttpHandler {
 				
 				if(parameters.containsKey("sum")){
 					if(parameters.get("sum").contains("*")){
-						userList = Datasource.fetchAllPlayers();
+						userList = datasource.fetchAllPlayers();
 					}
 					else {
-						userList = Datasource.fetchValidUsers(parameters.get("sum"));
+						userList = datasource.fetchValidUsers(parameters.get("sum"));
 					}
 					root.appendChild(getSumXml(userList, parameters));
 				}
