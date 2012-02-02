@@ -44,6 +44,7 @@ import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
+import de.sockenklaus.XmlStats.XSAuth;
 import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.Datasource.Datasource;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
@@ -115,8 +116,14 @@ public abstract class XmlWorker implements HttpHandler {
 				parameters = parseParameters(queryString);
 
 				/*
-				 * Create the XML doc stuff....
+				 * Check whether there is an auth key or not and set the currentKey
 				 */
+				XSAuth authmodule = XSAuth.getInstance();
+				if (parameters.containsKey("authkey") && !parameters.get("authkey").isEmpty()){
+					authmodule.setCurrentKey(parameters.get("authkey").get(0));
+				}
+				else authmodule.setCurrentKey("");
+				
 				
 				/*
 				 * Actually create the XML

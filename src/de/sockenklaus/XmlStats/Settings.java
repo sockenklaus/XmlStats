@@ -36,15 +36,15 @@ public class Settings {
 	private Settings(){
 		File f = new File(XmlStats.getInstance().getDataFolder(), configFilename);
 		
-		conf = new Configuration(f);
+		this.conf = new Configuration(f);
 		if(f.exists()){
-			conf.load();
+			this.conf.load();
 		} 
 		else {
-			conf.setProperty("options.webserver-enabled", true);
-			conf.setProperty("options.webserver-port", 9123);
-			conf.setProperty("options.verbose-enabled", true);
-			conf.save();
+			this.conf.setProperty("options.webserver-enabled", true);
+			this.conf.setProperty("options.webserver-port", 9123);
+			this.conf.setProperty("options.verbose-enabled", true);
+			this.conf.save();
 		}
 	}
 	
@@ -60,7 +60,7 @@ public class Settings {
 	 * @return the int
 	 */
 	public int getInt(String path){
-		return conf.getInt(path, -1);
+		return this.conf.getInt(path, -1);
 	}
 	
 	/**
@@ -70,7 +70,7 @@ public class Settings {
 	 * @return the boolean
 	 */
 	public boolean getBoolean(String path){
-		return conf.getBoolean(path, false);
+		return this.conf.getBoolean(path, false);
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class Settings {
 	 * @return the string
 	 */
 	public String getString(String path){
-		return conf.getString(path, "");
+		return this.conf.getString(path, "");
 	}
 	
 	/**
@@ -90,7 +90,7 @@ public class Settings {
 	 * @param value the value
 	 */
 	public void setProperty(String path, Object value){
-		conf.setProperty(path, value);
+		this.conf.setProperty(path, value);
 	}
 	
 	/**

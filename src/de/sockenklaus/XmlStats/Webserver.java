@@ -19,9 +19,6 @@ import java.net.InetSocketAddress;
 
 import com.sun.net.httpserver.HttpServer;
 
-import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
-import de.sockenklaus.XmlStats.Datasource.RegisterDS;
-import de.sockenklaus.XmlStats.Datasource.StatsDS;
 import de.sockenklaus.XmlStats.XmlWorkers.*;
 
 // TODO: Auto-generated Javadoc

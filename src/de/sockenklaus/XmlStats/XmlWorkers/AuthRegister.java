@@ -10,6 +10,7 @@ import java.util.Map;
 import org.bukkit.util.config.Configuration;
 import org.w3c.dom.Element;
 
+import de.sockenklaus.XmlStats.XSAuth;
 import de.sockenklaus.XmlStats.XmlStats;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 
@@ -33,8 +34,20 @@ public class AuthRegister extends XmlWorker {
 	 */
 	@Override
 	protected Element getXml(Map<String, List<String>> parameters) throws XmlStatsException {
-
-		if(parameters.containsKey("key")){
+		XSAuth authmodule = XSAuth.getInstance();
+		
+		if(authmodule.getCurrentKey().isEmpty()){
+			XmlStats.LogWarn("auth_register: There should be a key, but acutally there is no...");
+			throw new XmlStatsException("auth_register: There should be a key, but actually there is no...");
+		}
+		else if (parameters.containsKey("delete") && parameters.get("delete").get(0).equals("true")){
+			authmodule.remCurrentFromWhitelist();
+		}
+		else {
+			authmodule.addCurrentToWhitelist();
+		}
+		
+		/*if(parameters.containsKey("key")){
 			for (String key : parameters.get("key")){
 				XmlStats x_temp = XmlStats.getInstance();
 				File authKeyFile = new File(x_temp.getDataFolder(), this.authKeyFilename);
@@ -45,13 +58,13 @@ public class AuthRegister extends XmlWorker {
 					/*
 					 * Hier kann geschaut werden, ob der Key in der AuthKey steht
 					 * 
-					 */
+					 *
 					return null;
 				}
 				else {
 					/*
 					 * Datei existiert nicht, Key kann nicht existieren
-					 */
+					 *
 					File tempAuthKeyFile = new File(x_temp.getDataFolder(), this.tempAuthKeyFilname);
 					
 					Configuration tempAuthKeyConf = new Configuration(tempAuthKeyFile);
@@ -60,7 +73,7 @@ public class AuthRegister extends XmlWorker {
 						if(tempAuthKeyConf.getList("keys") != null && tempAuthKeyConf.getList("keys").contains(key)){
 							/*
 							 * Key existiert schon in auth_keys_tmp... mach was
-							 */
+							 *
 							return null;
 						}
 						else tempAuthKeyConf.setProperty("keys.key",key);
@@ -69,18 +82,16 @@ public class AuthRegister extends XmlWorker {
 						tempAuthKeyConf.setProperty("keys.key", key);
 						/*
 						 * Key wurde in auth_keys_tmp eingetragen... jetzt reagieren.
-						 */
+						 *
 						return null;
 					}
 					
 					tempAuthKeyConf.save();
 				}
 			}
-			XmlStats.LogWarn("auth_register: There should be a key, but acutally there is no...");
-			throw new XmlStatsException("auth_register: There should be a key, but actually there is no...");
 			
 		}
-		else throw new XmlStatsException("No key given!");
+		else throw new XmlStatsException("No key given!");*/
 		
 	}
 
