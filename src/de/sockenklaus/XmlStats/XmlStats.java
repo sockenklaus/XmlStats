@@ -21,8 +21,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
 
 import com.nidefawl.Achievements.Achievements;
 import terranetworkorg.Stats.Stats;
@@ -254,11 +252,11 @@ public class XmlStats extends JavaPlugin {
 	protected void reload() {
 		this.onDisable();
 		this.onEnable();
-		
 	}
+	
 	private void registerEvents(){
 		XmlStatsServerListener listener = new XmlStatsServerListener(this);
 
-		getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, listener, Priority.Monitor, this);
+		getServer().getPluginManager().registerEvents(listener, this);
 	}
 }
