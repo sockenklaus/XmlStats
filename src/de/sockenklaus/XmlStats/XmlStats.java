@@ -175,8 +175,10 @@ public class XmlStats extends JavaPlugin {
 	}
 	
 	protected void hookStats(){
-		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
+		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats 2.0");
+		LogDebug("Got Plugin \"Stats 2.0\"");
 		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
+		LogDebug("Got webserver-object");
 		
 		if(this.checkStats()){
         	XmlStatsRegistry.put("stats", (Stats)StatsTemp);
@@ -194,9 +196,15 @@ public class XmlStats extends JavaPlugin {
 	 * @return true, if is stats hooked
 	 */
 	public boolean checkStats(){
+		LogDebug("Stats 2.0? Are you there?");
 		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats 2.0");
+		LogDebug("Got object \"Stats 2.0\"");
 		
-		if(StatsTemp != null && StatsTemp.getClass().getName().equals("terranetworkorg.Stats.Stats") && StatsTemp.isEnabled()) return true;
+		if(StatsTemp != null && StatsTemp.getClass().getName().equals("terranetworkorg.Stats.Stats") && StatsTemp.isEnabled()){
+			LogDebug("terranetworkorg.Stats.Stats is enabled.");
+			return true;
+		}
+		LogDebug("terranetworkorg.Stats.Stats is not enabled.");
 		return false;
 	}
 	
@@ -255,8 +263,11 @@ public class XmlStats extends JavaPlugin {
 	}
 	
 	private void registerEvents(){
+		LogDebug("Trying to register ServerListener");
 		XmlStatsServerListener listener = new XmlStatsServerListener(this);
+		LogDebug("Listener-object created.");
 
 		getServer().getPluginManager().registerEvents(listener, this);
+		LogDebug("Event registered.");
 	}
 }

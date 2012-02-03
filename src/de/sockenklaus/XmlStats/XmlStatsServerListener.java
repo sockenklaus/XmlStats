@@ -43,7 +43,10 @@ public class XmlStatsServerListener implements Listener {
 	
 	@EventHandler
 	public void onPluginEnable(PluginEnableEvent event){
-		if(this.identifyPlugin(event, "stats")){
+		XmlStats.LogDebug("onPluginEnable fired");
+		
+		if(this.identifyPlugin(event, "stats 2.0")){
+			XmlStats.LogDebug("Stats 2.0 fired the event");
 			this.plugin.hookStats();
 		}
 		if(this.identifyPlugin(event, "achievements")){
