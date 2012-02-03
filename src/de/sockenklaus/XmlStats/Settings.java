@@ -1,5 +1,5 @@
 /*
- * Copyright (C) [2011]  [Pascal König]
+ * Copyright (C) [2011]  [Pascal Koenig]
 *
 * This program is free software; you can redistribute it and/or modify it under the terms of
 * the GNU General Public License as published by the Free Software Foundation; either version
@@ -15,8 +15,9 @@
 package de.sockenklaus.XmlStats;
 
 import java.io.File;
+import java.io.IOException;
 
-import org.bukkit.util.config.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -25,8 +26,8 @@ import org.bukkit.util.config.Configuration;
 public class Settings {
 	
 	private static final String configFilename = "config.yml";
-	private static Settings instance;
-	private Configuration conf;
+
+	private YamlConfiguration conf;
 	
 	/**
 	 * Instantiates a new settings.
@@ -36,15 +37,18 @@ public class Settings {
 	private Settings(){
 		File f = new File(XmlStats.getInstance().getDataFolder(), configFilename);
 		
-		this.conf = new Configuration(f);
 		if(f.exists()){
-			this.conf.load();
+			conf = YamlConfiguration.loadConfiguration(f);
 		} 
 		else {
-			this.conf.setProperty("options.webserver-enabled", true);
-			this.conf.setProperty("options.webserver-port", 9123);
-			this.conf.setProperty("options.verbose-enabled", true);
-			this.conf.save();
+			conf.set("options.webserver-enabled", true);
+			conf.set("options.webserver-port", 9123);
+			conf.set("options.verbose-enabled", true);
+			try {
+				conf.save(f);
+			}catch(IOException e){
+				XmlStats.LogError("Something went wrong with the conf-file: "+e.getMessage());
+			}
 		}
 	}
 	
@@ -90,7 +94,7 @@ public class Settings {
 	 * @param value the value
 	 */
 	public void setProperty(String path, Object value){
-		this.conf.setProperty(path, value);
+		conf.set(path, value);
 	}
 	
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) [2011]  [Pascal König]
+ * Copyright (C) [2011]  [Pascal Koenig]
 *
 * This program is free software; you can redistribute it and/or modify it under the terms of
 * the GNU General Public License as published by the Free Software Foundation; either version
@@ -20,9 +20,13 @@ import java.util.List;
 
 import org.w3c.dom.Element;
 
+<<<<<<< HEAD
 import com.nidefawl.Stats.datasource.Category;
 
 import de.sockenklaus.XmlStats.Datasource.StatsDS;
+=======
+import de.sockenklaus.XmlStats.Datasource.UserstatsDS;
+>>>>>>> stats2.0
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
 import de.sockenklaus.XmlStats.Objects.NodeCategories;
 import de.sockenklaus.XmlStats.Objects.NodeCategory;
@@ -59,7 +63,11 @@ public class UserStats extends XmlWorker {
 			node_users.appendChild(new NodeUser(userName));
 		}
 		
+<<<<<<< HEAD
 		HashMap<String, Category> addedStats = StatsDS.getInstance().getAddedStats(playerList);
+=======
+		HashMap<String, HashMap<String, Integer>> addedStats = UserstatsDS.getAddedStats(playerList);
+>>>>>>> stats2.0
 		
 		for(String catName : addedStats.keySet()){
 			NodeCategory node_cat = new NodeCategory(catName, addedStats.get(catName));

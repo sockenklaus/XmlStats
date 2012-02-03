@@ -1,5 +1,5 @@
 /*
- * Copyright (C) [2011]  [Pascal König]
+ * Copyright (C) [2011]  [Pascal Koenig]
 *
 * This program is free software; you can redistribute it and/or modify it under the terms of
 * the GNU General Public License as published by the Free Software Foundation; either version
@@ -19,13 +19,14 @@ import java.util.logging.Logger;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
-import de.sockenklaus.XmlStats.Datasource.RegisterDS;
-import de.sockenklaus.XmlStats.Datasource.StatsDS;
+import com.nidefawl.Achievements.Achievements;
+import terranetworkorg.Stats.Stats;
+import com.nijikokun.register.Register;
+import com.nijikokun.register.payment.Methods;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -145,6 +146,53 @@ public class XmlStats extends JavaPlugin {
 		if(Util.checkRegister()) RegisterDS.getInstance();
 	}
 	
+	protected void hookAchievements(){
+		Plugin AchievementsTemp = getServer().getPluginManager().getPlugin("Achievements");
+		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
+		
+        if(this.checkAchievements()){
+        	XmlStatsRegistry.put("achievements", (Achievements)AchievementsTemp);
+        	LogInfo("Hooked into Achievements!");
+        	webserver.startAchievements();
+        }
+        else {
+        	LogWarn("Achievements not found! Can't hook into it.");
+        }
+	}
+	
+	protected void hookStats(){
+		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats 2.0");
+		LogDebug("Got Plugin \"Stats 2.0\"");
+		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
+		LogDebug("Got webserver-object");
+		
+		if(this.checkStats()){
+        	XmlStatsRegistry.put("stats", (Stats)StatsTemp);
+        	LogInfo("Hooked into Stats!");
+        	webserver.startStats();
+        }
+        else {
+        	LogWarn("Stats not found! Can't hook into it.");
+        }
+	}
+	
+	/**
+	 * Checks if is stats hooked.
+	 *
+	 * @return true, if is stats hooked
+	 */
+	public boolean checkStats(){
+		LogDebug("Stats 2.0? Are you there?");
+		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats 2.0");
+		LogDebug("Got object \"Stats 2.0\"");
+		
+		if(StatsTemp != null && StatsTemp.getClass().getName().equals("terranetworkorg.Stats.Stats") && StatsTemp.isEnabled()){
+			LogDebug("terranetworkorg.Stats.Stats is enabled.");
+			return true;
+		}
+		LogDebug("terranetworkorg.Stats.Stats is not enabled.");
+		return false;
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.bukkit.plugin.java.JavaPlugin#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
@@ -174,11 +222,14 @@ public class XmlStats extends JavaPlugin {
 	protected void reload() {
 		this.onDisable();
 		this.onEnable();
-		
 	}
+	
 	private void registerEvents(){
-		XmlStatsServerListener listener = new XmlStatsServerListener();
+		LogDebug("Trying to register ServerListener");
+		XmlStatsServerListener listener = new XmlStatsServerListener(this);
+		LogDebug("Listener-object created.");
 
-		getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, listener, Priority.Monitor, this);
+		getServer().getPluginManager().registerEvents(listener, this);
+		LogDebug("Event registered.");
 	}
 }

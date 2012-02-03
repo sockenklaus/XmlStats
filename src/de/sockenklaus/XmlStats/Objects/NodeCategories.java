@@ -3,7 +3,7 @@
  */
 package de.sockenklaus.XmlStats.Objects;
 
-import com.nidefawl.Stats.datasource.PlayerStat;
+import java.util.HashMap;
 
 import de.sockenklaus.XmlStats.Datasource.StatsDS;
 
@@ -21,9 +21,10 @@ public class NodeCategories extends NodeArray {
 	 */
 	public NodeCategories(String userName) {
 		this();
-		PlayerStat userStat = StatsDS.getInstance().getPlayerStat(userName);
+
+		HashMap<String, HashMap<String, Integer>> userStat = UserstatsDS.getStats(userName);
 		
-		for(String catName : userStat.getCats()){
+		for(String catName : userStat.keySet()){
 			NodeCategory node_cat = new NodeCategory(catName, userStat.get(catName));
 			this.appendChild(node_cat);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) [2011]  [Pascal König]
+ * Copyright (C) [2011]  [Pascal Koenig]
 *
 * This program is free software; you can redistribute it and/or modify it under the terms of
 * the GNU General Public License as published by the Free Software Foundation; either version
@@ -18,12 +18,15 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bukkit.plugin.Plugin;
+import terranetworkorg.Stats.Stats;
+import terranetworkorg.Stats.Storage.PlayerCache;
+import terranetworkorg.Stats.Storage.PlayerControl;
+import terranetworkorg.Stats.Storage.PlayerStats;
 
-import com.nidefawl.Stats.Stats;
+/*import com.nidefawl.Stats.Stats;
 import com.nidefawl.Stats.datasource.Category;
 import com.nidefawl.Stats.datasource.PlayerStat;
-import com.nidefawl.Stats.datasource.PlayerStatSQL;
+import com.nidefawl.Stats.datasource.PlayerStatSQL;*/
 
 import de.sockenklaus.XmlStats.Util;
 import de.sockenklaus.XmlStats.Webserver;
@@ -68,47 +71,82 @@ public class StatsDS extends Datasource {
 		return this.stats.getDataFolder();
 	}
 	
-	public HashMap<String, Category> getAddedStats(List<String> playerList){
-		HashMap <String, Category> result = new HashMap<String, Category>();
-				
+	public static HashMap<String, HashMap<String, Integer>> getAddedStats(List<String> playerList){
+		HashMap <String, HashMap<String, Integer>> result = new HashMap<String, HashMap<String, Integer>>();
+		
 		for(String playerName : playerList){
-			PlayerStat player = getPlayerStat(playerName);
+			PlayerCache player = getPlayerCache(playerName);
 			
-			for(String catName : player.getCats()){
-				Category cat = player.get(catName);
-				
-				for(String entryName : cat.getEntries()){
-					Integer entry = cat.get(entryName);
+			for(PlayerStats ps : player.getStats()){
+				if(!result.containsKey(ps.getCat())){
+					/*
+					 * Fall 1:
+					 * Result enthaelt schon die Kat nicht
+					 */
+					HashMap<String, Integer> tmpMap = new HashMap<String, Integer>();
+					tmpMap.put(ps.getName(), ps.getValue());
+					result.put(ps.getCat(), tmpMap);
+				}
+				else if(!result.get(ps.getCat()).containsKey(ps.getName())){
+					/*
+					 * Fall 2: Result enthaelt Cat aber Stat nicht.
+					 */
+					result.get(ps.getCat()).put(ps.getName(), ps.getValue());
+				}
+				else {
+					/*
+					 * Fall 3: Es ist beides schon vorhanden
+					 */
+					Integer currVal = result.get(ps.getCat()).get(ps.getName());
 					
-					if(result.containsKey(catName)){
-						
-						if(entryName.equals("lastlogin") || entryName.equals("lastlogout")){
-							result.get(catName).put(entryName, Math.max(result.get(catName).get(entryName), entry));
-						}
-						else {
-							result.get(catName).add(entryName, entry);
-						}
-						
+					if(ps.getName().equals("lastlogin") || ps.getName().equals("lastlogout")){
+						result.get(ps.getCat()).put(ps.getName(), Math.max(ps.getValue(), currVal));
 					}
 					else {
-						Category tempCat = new Category();
-						tempCat.add(entryName, entry);
-						result.put(catName, tempCat);
+						result.get(ps.getCat()).put(ps.getName(), currVal + ps.getValue());
 					}
 				}
 			}
 		}
-		
+				
 		return result;
 	}
 
-	public PlayerStat getPlayerStat(String playerName){
-			
-		PlayerStat result = new PlayerStatSQL(playerName, this.getStats());
+	public static HashMap<String, HashMap<String, Integer>> getStats(String playerName){
+		HashMap<String, HashMap<String, Integer>> result = new HashMap<String, HashMap<String, Integer>>();
 		
-		result.load();
+		PlayerCache player = getPlayerCache(playerName);
+		
+		for(PlayerStats ps : player.getStats()){
+			if(!result.containsKey(ps.getCat())){
+				/*
+				 * Fall 1: Result enthaelt die Kategorie nicht.
+				 */
+				HashMap<String, Integer> tmpMap = new HashMap<String, Integer>();
+				tmpMap.put(ps.getName(), ps.getValue());
+				result.put(ps.getCat(), tmpMap);
+			}
+			else if(!result.get(ps.getCat()).containsKey(ps.getName())){
+				/*
+				 * Fall 2: Result kennt Kategorie, aber nicht den Stat.
+				 */
+				result.get(ps.getCat()).put(ps.getName(), ps.getValue());
+			}
+			else {
+				/*
+				 * Fall 3 (sollte nicht auftreten): Result kennt beides schon.
+				 * Im Zweifel ueberschreiben...
+				 */
+				result.get(ps.getCat()).put(ps.getName(), ps.getValue());
+			}
+		}
 		
 		return result;
+		
+	}
+
+	private static PlayerCache getPlayerCache(String playerName){
+		return PlayerControl.getPlayerCache(playerName);
 	}
 	
 	private void hookStats(){
