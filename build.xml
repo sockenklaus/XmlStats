@@ -5,7 +5,7 @@
 	<property name="dist" value="dist" />
 	<property name="src" value="src" />
 	<property name="name" value="XmlStats" />
-	<property name="version" value="0.3" />
+	<property name="version" value="0.4" />
 	<property name="package" value="de/sockenklaus/XmlStats" />
 	<property name="resources" value="resources" />
 	<property name="author" value="sockenklaus" />
@@ -13,9 +13,8 @@
 	<path id="classpath">
     	<pathelement location="lib/Achievements.jar" />
 		<pathelement location="lib/Stats.jar" />
-		<pathelement location="lib/iConomy.jar" />
-		<pathelement location="lib/bukkit-0.0.1-SNAPSHOT.jar" />
-		<pathelement location="lib/Register-1.5.jar" />
+		<pathelement location="lib/bukkit-1.1-R3.jar" />
+		<pathelement location="lib/Register.jar" />
    	</path>
 	
 	<buildnumber file=".build.number" />

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) [2011]  [Pascal König]
+ * Copyright (C) [2011]  [Pascal Koenig]
 *
 * This program is free software; you can redistribute it and/or modify it under the terms of
 * the GNU General Public License as published by the Free Software Foundation; either version
@@ -18,10 +18,15 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import com.nidefawl.Stats.Stats;
+import terranetworkorg.Stats.Stats;
+import terranetworkorg.Stats.Storage.PlayerCache;
+import terranetworkorg.Stats.Storage.PlayerControl;
+import terranetworkorg.Stats.Storage.PlayerStats;
+
+/*import com.nidefawl.Stats.Stats;
 import com.nidefawl.Stats.datasource.Category;
 import com.nidefawl.Stats.datasource.PlayerStat;
-import com.nidefawl.Stats.datasource.PlayerStatSQL;
+import com.nidefawl.Stats.datasource.PlayerStatSQL;*/
 
 import de.sockenklaus.XmlStats.XmlStatsRegistry;
 
@@ -31,78 +36,93 @@ import de.sockenklaus.XmlStats.XmlStatsRegistry;
  */
 public class UserstatsDS extends Datasource {
 	
-	private Stats statsPlugin;
-
-	/**
-	 * Instantiates a new stats ds.
-	 */
-	public UserstatsDS() {
-		this.statsPlugin = (Stats)XmlStatsRegistry.get("stats");
-	}
-	
-	/**
-	 * Gets the plugin.
-	 *
-	 * @return the plugin
-	 */
-//	public Stats getPlugin() {
-	//	return this.statsPlugin;
-	//}
+	private static Stats statsPlugin;
 	
 	/**
 	 * Gets the data folder.
 	 *
 	 * @return the data folder
 	 */
-	public File getDataFolder(){
-		return this.statsPlugin.getDataFolder();
+	public static File getDataFolder(){
+		statsPlugin = (Stats)XmlStatsRegistry.get("stats");
+		return statsPlugin.getDataFolder();
 	}
 	
-	public HashMap<String, HashMap<String, Integer>> getAddedStats(List<String> playerList){
+	public static HashMap<String, HashMap<String, Integer>> getAddedStats(List<String> playerList){
 		HashMap <String, HashMap<String, Integer>> result = new HashMap<String, HashMap<String, Integer>>();
 		
 		for(String playerName : playerList){
-			PlayerStat player = this.getPlayerStat(playerName);
+			PlayerCache player = getPlayerCache(playerName);
 			
-			for(String catName : player.getCats()){
-				Category cat = player.get(catName);
-				
-				for(String entryName : cat.getEntries()){
-					Integer entry = cat.get(entryName);
+			for(PlayerStats ps : player.getStats()){
+				if(!result.containsKey(ps.getCat())){
+					/*
+					 * Fall 1:
+					 * Result enthaelt schon die Kat nicht
+					 */
+					HashMap<String, Integer> tmpMap = new HashMap<String, Integer>();
+					tmpMap.put(ps.getName(), ps.getValue());
+					result.put(ps.getCat(), tmpMap);
+				}
+				else if(!result.get(ps.getCat()).containsKey(ps.getName())){
+					/*
+					 * Fall 2: Result enthaelt Cat aber Stat nicht.
+					 */
+					result.get(ps.getCat()).put(ps.getName(), ps.getValue());
+				}
+				else {
+					/*
+					 * Fall 3: Es ist beides schon vorhanden
+					 */
+					Integer currVal = result.get(ps.getCat()).get(ps.getName());
 					
-					if(result.containsKey(catName)){
-						if(result.get(catName).containsKey(entryName)){
-							
-							if(entryName.equals("lastlogin") || entryName.equals("lastlogout")){
-								result.get(catName).put(entryName, Math.max(result.get(catName).get(entryName), entry));
-							}
-							else {
-								Integer tempInt = result.get(catName).get(entryName) + entry;
-								result.get(catName).put(entryName, tempInt);
-							}
-
-						}
-						else {
-							result.get(catName).put(entryName, entry);
-						}
+					if(ps.getName().equals("lastlogin") || ps.getName().equals("lastlogout")){
+						result.get(ps.getCat()).put(ps.getName(), Math.max(ps.getValue(), currVal));
 					}
 					else {
-						HashMap<String, Integer> tempMap = new HashMap<String, Integer>();
-						tempMap.put(entryName, entry);
-						result.put(catName, tempMap);
+						result.get(ps.getCat()).put(ps.getName(), currVal + ps.getValue());
 					}
 				}
 			}
 		}
-		
+				
 		return result;
 	}
-
-	public PlayerStat getPlayerStat(String playerName){
-		PlayerStat result = new PlayerStatSQL(playerName, this.statsPlugin);
+	
+	public static HashMap<String, HashMap<String, Integer>> getStats(String playerName){
+		HashMap<String, HashMap<String, Integer>> result = new HashMap<String, HashMap<String, Integer>>();
 		
-		result.load();
+		PlayerCache player = getPlayerCache(playerName);
+		
+		for(PlayerStats ps : player.getStats()){
+			if(!result.containsKey(ps.getCat())){
+				/*
+				 * Fall 1: Result enthaelt die Kategorie nicht.
+				 */
+				HashMap<String, Integer> tmpMap = new HashMap<String, Integer>();
+				tmpMap.put(ps.getName(), ps.getValue());
+				result.put(ps.getCat(), tmpMap);
+			}
+			else if(!result.get(ps.getCat()).containsKey(ps.getName())){
+				/*
+				 * Fall 2: Result kennt Kategorie, aber nicht den Stat.
+				 */
+				result.get(ps.getCat()).put(ps.getName(), ps.getValue());
+			}
+			else {
+				/*
+				 * Fall 3 (sollte nicht auftreten): Result kennt beides schon.
+				 * Im Zweifel ueberschreiben...
+				 */
+				result.get(ps.getCat()).put(ps.getName(), ps.getValue());
+			}
+		}
 		
 		return result;
+		
+	}
+
+	private static PlayerCache getPlayerCache(String playerName){
+		return PlayerControl.getPlayerCache(playerName);
 	}
 }

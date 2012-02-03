@@ -1,5 +1,5 @@
 /*
- * Copyright (C) [2011]  [Pascal König]
+ * Copyright (C) [2011]  [Pascal Koenig]
 *
 * This program is free software; you can redistribute it and/or modify it under the terms of
 * the GNU General Public License as published by the Free Software Foundation; either version
@@ -19,13 +19,11 @@ import java.util.logging.Logger;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nidefawl.Achievements.Achievements;
-import com.nidefawl.Stats.Stats;
+import terranetworkorg.Stats.Stats;
 import com.nijikokun.register.Register;
 import com.nijikokun.register.payment.Methods;
 
@@ -177,8 +175,10 @@ public class XmlStats extends JavaPlugin {
 	}
 	
 	protected void hookStats(){
-		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
+		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats 2.0");
+		LogDebug("Got Plugin \"Stats 2.0\"");
 		Webserver webserver = (Webserver)XmlStatsRegistry.get("webserver");
+		LogDebug("Got webserver-object");
 		
 		if(this.checkStats()){
         	XmlStatsRegistry.put("stats", (Stats)StatsTemp);
@@ -196,9 +196,15 @@ public class XmlStats extends JavaPlugin {
 	 * @return true, if is stats hooked
 	 */
 	public boolean checkStats(){
-		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats");
+		LogDebug("Stats 2.0? Are you there?");
+		Plugin StatsTemp = getServer().getPluginManager().getPlugin("Stats 2.0");
+		LogDebug("Got object \"Stats 2.0\"");
 		
-		if(StatsTemp != null && StatsTemp.getClass().getName().equals("com.nidefawl.Stats.Stats") && StatsTemp.isEnabled()) return true;
+		if(StatsTemp != null && StatsTemp.getClass().getName().equals("terranetworkorg.Stats.Stats") && StatsTemp.isEnabled()){
+			LogDebug("terranetworkorg.Stats.Stats is enabled.");
+			return true;
+		}
+		LogDebug("terranetworkorg.Stats.Stats is not enabled.");
 		return false;
 	}
 	
@@ -254,12 +260,14 @@ public class XmlStats extends JavaPlugin {
 	protected void reload() {
 		this.onDisable();
 		this.onEnable();
-		
 	}
+	
 	private void registerEvents(){
+		LogDebug("Trying to register ServerListener");
 		XmlStatsServerListener listener = new XmlStatsServerListener(this);
+		LogDebug("Listener-object created.");
 
-		getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, listener, Priority.Monitor, this);
-		//getServer().getPluginManager().registerEvent(Type.PLUGIN_DISABLE, listener, Priority.Monitor, this);
+		getServer().getPluginManager().registerEvents(listener, this);
+		LogDebug("Event registered.");
 	}
 }

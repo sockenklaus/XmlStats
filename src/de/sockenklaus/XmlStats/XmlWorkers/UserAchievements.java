@@ -8,10 +8,11 @@ import java.util.Map;
 
 import org.w3c.dom.Element;
 
-import com.nidefawl.Achievements.PlayerAchievement;
-
 import de.sockenklaus.XmlStats.Datasource.AchievementsDS;
 import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
+import de.sockenklaus.XmlStats.Objects.NodeUser;
+import de.sockenklaus.XmlStats.Objects.NodeUserAchievements;
+import de.sockenklaus.XmlStats.Objects.NodeUsers;
 
 /**
  * @author socrates
@@ -33,27 +34,6 @@ public class UserAchievements extends XmlWorker {
 		throw new XmlStatsException("No data provided with this query!");
 	}
 	
-	private Element getUserAchievement(String userName){
-		Element elem_player = this.doc.createElement("user");
-		elem_player.appendChild(getTextElem("name", userName));
-		
-		PlayerAchievement pa = achDS.getUserAchievement(userName);
-		
-		Element elem_achs = this.doc.createElement("achievements");
-		elem_achs.setAttribute("count", String.valueOf(pa.achievements.size()));
-		
-		for(String achName : pa.achievements.keySet()){
-			Element elem_ach = this.doc.createElement("achievement");
-			elem_ach.appendChild(getTextElem("name", achName));
-			elem_ach.appendChild(getTextElem("count", pa.achievements.get(achName).getCount()));
-			
-			elem_achs.appendChild(elem_ach);
-		}
-		elem_player.appendChild(elem_achs);
-		
-		return elem_player;
-	}
-
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getSumXml(java.util.List, java.util.Map)
 	 */
@@ -66,16 +46,16 @@ public class UserAchievements extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getUserXml(java.util.List, java.util.Map)
 	 */
 	@Override
-	protected Element getUserXml(List<String> userList, Map<String, List<String>> parameters) {
-		Element elem_users = this.doc.createElement("users");
-		elem_users.setAttribute("count", String.valueOf(userList.size()));
+	protected Element getUserXml(List<String> userList, Map<String, List<String>> parameters) throws XmlStatsException{
+		NodeUsers node_users = new NodeUsers();
 		
 		for(String userName : userList){
-			
-			elem_users.appendChild(this.getUserAchievement(userName));
+			NodeUser node_user = new NodeUser(userName);
+			node_user.appendChild(new NodeUserAchievements(userName));
+			node_users.appendChild(node_user);
 		}
-		
-		return elem_users;
+	
+		return node_users.getXml(this.doc);
 	}
 
 }

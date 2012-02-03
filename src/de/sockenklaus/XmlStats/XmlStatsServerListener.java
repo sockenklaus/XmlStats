@@ -3,15 +3,16 @@
  */
 package de.sockenklaus.XmlStats;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.server.ServerListener;
 
 /**
  * @author socrates
  *
  */
-public class XmlStatsServerListener extends ServerListener {
+public class XmlStatsServerListener implements Listener {
 	private XmlStats plugin;
 	
 	public XmlStatsServerListener(XmlStats plugin){
@@ -40,8 +41,12 @@ public class XmlStatsServerListener extends ServerListener {
 		
 	}
 	
+	@EventHandler
 	public void onPluginEnable(PluginEnableEvent event){
-		if(this.identifyPlugin(event, "stats")){
+		XmlStats.LogDebug("onPluginEnable fired");
+		
+		if(this.identifyPlugin(event, "stats 2.0")){
+			XmlStats.LogDebug("Stats 2.0 fired the event");
 			this.plugin.hookStats();
 		}
 		if(this.identifyPlugin(event, "achievements")){

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) [2011]  [Pascal König]
+ * Copyright (C) [2011]  [Pascal Koenig]
 *
 * This program is free software; you can redistribute it and/or modify it under the terms of
 * the GNU General Public License as published by the Free Software Foundation; either version
@@ -14,16 +14,15 @@
 */
 package de.sockenklaus.XmlStats.XmlWorkers;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
 
-import org.bukkit.entity.Player;
 import org.w3c.dom.Element;
 
-import de.sockenklaus.XmlStats.XmlStats;
-import de.sockenklaus.XmlStats.XmlStatsRegistry;
 import de.sockenklaus.XmlStats.Datasource.Datasource;
+import de.sockenklaus.XmlStats.Exceptions.XmlStatsException;
+import de.sockenklaus.XmlStats.Objects.NodeUser;
+import de.sockenklaus.XmlStats.Objects.NodeUsers;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -35,52 +34,22 @@ public class UserList extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getXML(java.util.Map)
 	 */
 	@Override
-	public Element getXml(Map<String, List<String>> parameters) {
+	public Element getXml(Map<String, List<String>> parameters) throws XmlStatsException {
 	
-		Element elem_users = this.doc.createElement("users");
-		elem_users.setAttribute("count", String.valueOf(Datasource.fetchAllPlayers().size()));
-		
-		/*
-		 * Get list online player names
-		 */
-		XmlStats pluginTemp= (XmlStats)XmlStatsRegistry.get("xmlstats");
-
-		Player[] onlinePlayers = pluginTemp.getServer().getOnlinePlayers();
-		List<String> onlinePlayerNames = new ArrayList<String>();
-
-		if (onlinePlayers != null){
-			for (int i = 0; i < onlinePlayers.length; i++){
-				onlinePlayerNames.add(onlinePlayers[i].getName());
-			}
-		}
-		/*
-		 * Got list of online player names
-		 */
-
-		/*
-		 * Hier wird das XML aufgebaut
-		 */
+		NodeUsers node_users = new NodeUsers();
 
 		for(String playerName : Datasource.fetchAllPlayers()){
-
-			Element elem_player = this.doc.createElement("user");
-			elem_player.appendChild(getTextElem("name", playerName));
-
-			elem_player.setAttribute("status", onlinePlayerNames.contains(playerName) ? "online":"offline");
-
-			elem_users.appendChild(elem_player);
+			node_users.appendChild(new NodeUser(playerName));
 		}
-		/*
-		 * Hier endet der XML-Aufbau
-		 */
-		return elem_users;
+
+		return node_users.getXml(this.doc);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getSumXml(java.util.List, java.util.Map)
 	 */
 	@Override
-	protected Element getSumXml(List<String> playerList, Map<String, List<String>> parameters) {
+	protected Element getSumXml(List<String> playerList, Map<String, List<String>> parameters) throws XmlStatsException {
 		return this.getXml(parameters);
 	}
 
@@ -88,7 +57,7 @@ public class UserList extends XmlWorker {
 	 * @see de.sockenklaus.XmlStats.XmlWorkers.XmlWorker#getUserXml(java.util.List, java.util.Map)
 	 */
 	@Override
-	protected Element getUserXml(List<String> playerList, Map<String, List<String>> parameters) {
+	protected Element getUserXml(List<String> playerList, Map<String, List<String>> parameters) throws XmlStatsException {
 		return this.getXml(parameters);
 	}
 	
