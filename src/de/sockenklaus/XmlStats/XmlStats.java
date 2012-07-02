@@ -44,6 +44,7 @@ public class XmlStats extends JavaPlugin {
 		if(instance == null){
 			instance = new XmlStats();
 		}
+		
 		return instance;
 	}
 	
